@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How I Rescued My Dad's Work Files — Alvin Abyan</title>
+  <meta name="description" content="A practical, step-by-step rescue of a Windows 11 laptop with BitLocker and VMD complications." />
+  <meta property="og:title" content="How I Rescued My Dad's Work Files" />
+  <meta property="og:description" content="Blue screens, BitLocker, VMD drivers, and the simple shift that saved the data." />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script>
+    (function(){var t;try{t=localStorage.getItem('theme-preference')}catch(e){}if(!t)t='light';var r=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',r)})();
+  </script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../" class="nav-logo">Alvin Abyan</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="primary-nav">
+        <a href="../#life">Life</a>
+        <a href="../#photography">Photography</a>
+        <a href="../#outdoors">Outdoors</a>
+        <a href="../#travel">Travel</a>
+        <a href="../#writing">Writing</a>
+        <a href="../#professional">Professional</a>
+        <a href="index.html">Blog</a>
+        <a href="../photography/index.html">Gallery</a>
+        <button class="theme-toggle" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="reading-progress" aria-hidden="true">
+    <div class="reading-progress-bar"></div>
+  </div>
+
+  <!-- Blog Post -->
+  <article class="blog-post">
+    <div class="container container--narrow">
+      <h1>How I Rescued My Dad's Work Files From a Broken Windows 11 Laptop — And What I Learned Along the Way</h1>
+      <div class="post-meta">February 8, 2026 · 24 min read</div>
+
+      <div class="post-content">
+        <p><em>A day-long battle with blue screens, BitLocker, missing drivers, a Haiku-vs-Opus AI showdown, and the moment I finally stopped trying to save Windows and just saved what mattered.</em></p>
+
+        <h2>The Problem</h2>
+        <p>My dad's HP Laptop 14s-dq2614TU (669F1PA) wouldn't boot. It was stuck in a loop: a <code>KMODE_EXCEPTION_NOT_HANDLED</code> blue screen (STOP code <code>0x0000001E</code>), followed by a failed Startup Repair screen pointing to <code>SrtTrail.txt</code>, followed by another crash. No Safe Mode. No recovery. Just a laptop full of work documents — including a folder called "Dokumen Kantor" — and absolutely no way in.</p>
+        <p>The internal drive was a Samsung MZVLQ512HBLU-00BH1 — a PM991a series OEM NVMe SSD. Not a consumer retail drive (like the 970 EVO or 960 PRO lines that Samsung provides drivers for), but an OEM part that relies on Microsoft's generic NVMe driver through the Intel RST controller. This distinction would matter later.</p>
+        <p>What followed was an entire day of troubleshooting, dead ends, and eventually a solution so simple I wish I'd tried it first. This article is my reflection on the whole experience: what went wrong, what I learned about how modern PCs actually work under the hood, and the approach that finally got my dad's files back.</p>
+
+        <h2>Preparing the Tools: The Bootable USB Saga</h2>
+        <p>Before I could do anything, I needed bootable media. I work on a MacBook Pro, so creating bootable USBs for Windows and Linux meant navigating macOS's quirks and limitations. I used Claude Code (Anthropic's terminal-based AI coding assistant) to help automate the process — which led to its own set of lessons.</p>
+
+        <h3>Creating the Ubuntu Live USB (with <code>dd</code>)</h3>
+        <p>The first USB I made was for Ubuntu. The idea was simple: boot a live Linux environment, mount the NVMe drive, and copy files off. Claude Code (running the Haiku model) helped me write the Ubuntu ISO to my HP v212w 15.5GB flash drive using <code>dd</code>:</p>
+<pre><code>sudo dd if=/Users/alvin/Downloads/ubuntu.iso of=/dev/rdisk6 bs=4m
+</code></pre>
+        <p>A few things I learned here:</p>
+        <p><strong><code>/dev/rdisk6</code> vs <code>/dev/disk6</code>:</strong> On macOS, <code>/dev/rdisk</code> is the raw disk device, which bypasses the buffer cache and writes significantly faster than <code>/dev/disk</code>. For large sequential writes like flashing an ISO, always use <code>rdisk</code>.</p>
+        <p><strong><code>bs=4m</code> (block size):</strong> This tells <code>dd</code> to read and write 4 megabytes at a time. Larger block sizes mean fewer I/O operations and faster throughput. The <code>m</code> suffix is lowercase on macOS's <code>dd</code> implementation (GNU <code>dd</code> uses <code>M</code>).</p>
+        <p><strong>Monitoring progress with <code>Ctrl+T</code>:</strong> Unlike GNU <code>dd</code> on Linux (which supports <code>status=progress</code> or responds to <code>SIGUSR1</code>), macOS's <code>dd</code> shows progress when you send <code>SIGINFO</code> via <code>Ctrl+T</code>. It doesn't auto-update — you have to keep pressing it. Annoying, but functional.</p>
+        <p>The Ubuntu USB worked perfectly. Linux ISOs are hybrid images (thanks to <code>isohybrid</code>) designed to boot from both optical media and USB drives when written as raw block devices. This is why <code>dd</code> works flawlessly for Linux.</p>
+
+        <h3>Creating the Windows 11 USB — Where Things Got Interesting</h3>
+        <p>Windows ISOs are a different animal entirely. I initially tried the same <code>dd</code> approach with the Windows 11 ISO (<code>Win11.iso</code>, 7.2GB downloaded from Microsoft):</p>
+<pre><code>sudo dd if=/Users/alvin/Downloads/Win11.iso of=/dev/rdisk6 bs=4m
+</code></pre>
+        <p>The write completed. The files were all there when I mounted the USB. But the laptop wouldn't boot from it — it got stuck at the manufacturer's logo after displaying "Press any key to boot from CD/DVD." This sent me down a rabbit hole.</p>
+        <p><strong>Why <code>dd</code> doesn't work for Windows ISOs:</strong> Windows ISOs are not hybrid images. They're designed for optical media (UDF filesystem) and expect a proper bootloader setup on USB drives. When you <code>dd</code> a Windows ISO to a USB, you get a raw UDF image that lacks the FAT32/NTFS boot partition structure that UEFI firmware expects. The files are physically present but the boot chain is broken. Linux ISOs embed an MBR <em>and</em> a GPT in the ISO image itself; Windows ISOs don't.</p>
+        <p><strong>The Haiku moment:</strong> I was running Claude Code with the Haiku 4.5 model at this point. Haiku confidently guided me through the <code>dd</code> approach, then when it failed, tried to install Balena Etcher (~400MB download) before I stopped it. When I asked Haiku to review what went wrong, it admitted: "That was my mistake — I should have known that <code>dd</code> doesn't work for Windows ISOs." I switched to the Opus model (<code>claude --model opus</code>) for the successful attempt.</p>
+
+        <h3>The Correct Windows USB Method (with <code>wimlib</code>)</h3>
+        <p>The Opus model immediately identified the real approach: format the USB as MBR/FAT32, mount the ISO, and copy the files over — with one critical extra step for the <code>install.wim</code> file.</p>
+        <p><strong>The FAT32 4GB file size limit:</strong> FAT32 is the most universally bootable filesystem (both UEFI and Legacy BIOS can read it), but it caps individual files at 4GB (4,294,967,295 bytes, or 2<sup>32</sup> - 1). The Windows 11 ISO contains <code>install.wim</code> — the Windows Image file containing the compressed OS — weighing in at <strong>6.4GB</strong>. It doesn't fit.</p>
+        <p><strong>The solution — <code>wimlib-imagex split</code>:</strong> Claude Code installed <code>wimlib</code> via Homebrew (<code>brew install wimlib</code>), then:</p>
+        <ol>
+          <li>Formatted the USB as MBR/FAT32: <code>diskutil eraseDisk FAT32 WIN11 MBRFormat /dev/disk6</code></li>
+          <li>Mounted the ISO (double-clicking on macOS mounts ISOs at <code>/Volumes/CCCOMA_X64FRE_EN-US_DV9</code>)</li>
+          <li>Copied all files <em>except</em> <code>install.wim</code> via <code>rsync</code> (862MB of bootloader, setup files, etc.)</li>
+          <li>Split <code>install.wim</code> into FAT32-compatible chunks:
+<pre><code>wimlib-imagex split /Volumes/CCCOMA_X64FRE_EN-US_DV9/sources/install.wim \\
+    /Volumes/WIN11/sources/install.swm 3800
+</code></pre>
+          </li>
+        </ol>
+        <p>This produced <code>install.swm</code> (3.7GB) and <code>install2.swm</code> (2.6GB). The <code>.swm</code> extension is the Split Windows Image format — the Windows installer recognizes it automatically and reassembles the image during setup.</p>
+        <p><strong>MBR vs GPT for bootable USB:</strong> My first Haiku-guided attempt used GPT (GUID Partition Table), which is the modern standard for UEFI systems. But for maximum boot compatibility — especially on machines that might fall back to CSM/Legacy mode — MBR (Master Boot Record) with FAT32 is safer. Windows 11 requires UEFI for <em>installation</em>, but the USB boot media itself works better as MBR/FAT32 because every UEFI implementation can boot from FAT32, and MBR is a simpler boot path.</p>
+
+        <h2>The Rabbit Hole: Everything I Tried (And Why It Failed)</h2>
+
+        <h3>Attempt 1: Windows Recovery Tools</h3>
+        <p>The first instinct was to fix Windows itself. The built-in Windows Recovery Environment (WinRE) offers tools like Startup Repair, System File Checker (<code>sfc /scannow</code>), and DISM (Deployment Image Servicing and Management). The problem? My system was so corrupt that the recovery environment itself would either crash or fail silently.</p>
+        <p><strong>What I learned:</strong> WinRE lives on a small hidden partition on your drive (typically 500MB–1GB, formatted as NTFS, with a <code>winre.wim</code> image inside). If the main Windows installation is severely corrupted — or if system files crash the scanner mid-way (mine froze at 18% repeatedly) — WinRE can't help you. I also tried the old boot record repair commands from Command Prompt (<code>bootrec /fixmbr</code>, <code>bootrec /fixboot</code>, <code>bootrec /rebuildbcd</code>) and the offline system file check (<code>sfc /scannow /offbootdir=C:\\ /offwindir=C:\\Windows</code>). None survived long enough to complete.</p>
+
+        <h3>Attempt 2: Reset This PC</h3>
+        <p>Windows 11 has a "Reset this PC" feature that's supposed to reinstall the OS. I actually got to the "Getting connection ready" screen once, which felt like progress — but it failed too. The reset feature needs to either download a fresh copy of Windows from Microsoft's servers or use the local recovery image. My corrupted system couldn't sustain either process long enough.</p>
+        <p><strong>What <code>KMODE_EXCEPTION_NOT_HANDLED</code> actually means:</strong> This is a kernel-mode crash. The "kernel" is the deepest layer of the operating system — it manages hardware, memory, and processes. When a driver or kernel-level program throws an exception (an unexpected error) that nothing catches, Windows has no choice but to stop everything. That's the blue screen. The error handler didn't catch it — indicating the fault was in Ring 0 code (kernel space), not Ring 3 (user space). In my case, something at the driver level was so broken that Windows couldn't even run long enough to repair itself.</p>
+
+        <h3>Attempt 3: The Ubuntu Live USB Detour</h3>
+        <p>Since Windows was a dead end, I pivoted to Linux. The plan was to boot the Ubuntu live USB I'd created earlier (the one made with <code>dd</code> — which did work correctly for Linux), browse the drive from outside Windows, and copy the files to an external drive. Simple in theory.</p>
+        <p>There were two problems.</p>
+        <p><strong>Problem one: the drive was invisible.</strong> My dad's laptop has an 11th-gen Intel Core i3 processor (Tiger Lake architecture, codename TGL) with a technology called Intel Volume Management Device (VMD). VMD is an abstraction layer that sits between the NVMe SSD and the operating system — it virtualizes the storage controller so Intel can provide features like hot-plug support and LED management for NVMe drives. The Ubuntu kernel I was using didn't include the VMD driver (<code>vmd</code> kernel module), so it couldn't see the drive at all. I had to go into BIOS (F10 on HP laptops) and change the storage controller mode from RAID/RST to AHCI just so the operating system could talk to the hardware directly.</p>
+        <p><strong>What's the difference between AHCI and RAID/RST?</strong> AHCI (Advanced Host Controller Interface) is the standard mode for SATA/NVMe drives — it lets the OS communicate with the drive directly via the standard NVMe/AHCI command set. Intel RST (Rapid Storage Technology) adds a layer on top for features like RAID arrays, Optane caching, and centralized management. When RST/VMD is enabled, the OS needs Intel's specific <code>iaStorVD</code> driver to see the drive. Disabling VMD and switching to AHCI removes that extra layer, making the drive visible to any OS with basic NVMe support (<code>nvme</code> kernel module).</p>
+        <p><strong>Problem two: BitLocker.</strong> Once the drive appeared in Ubuntu, I discovered my dad's D: partition was encrypted. Windows 11 has a feature called "Device Encryption" that silently enables BitLocker-like encryption on many modern devices — even if you never asked for it. My dad never set up BitLocker manually, never logged into a Microsoft account (where the recovery key would normally be backed up), and the <code>manage-bde -protectors -get D:</code> command showed "No key protectors found." The partition was encrypted with no externally accessible key.</p>
+        <p>I tried <code>dislocker</code> (a Linux FUSE-based tool for mounting BitLocker volumes) — it returned "Cannot parse volume header. Abort." The BitLocker metadata was corrupted.</p>
+        <p><strong>The invisible encryption trap:</strong> This was the most frustrating discovery. Windows 11, on newer hardware with TPM 2.0 (Trusted Platform Module), can automatically enable Device Encryption during OOBE (Out-of-Box Experience) setup. The encryption key is silently sealed inside the TPM using Platform Configuration Registers (PCRs) and is <em>supposed</em> to be backed up to your Microsoft account. But if you set up Windows with a local account, that backup never happens. The encryption is there, it's protecting your data, and you might not even know it exists until you need to access the drive from outside Windows — at which point it becomes a wall. Check Settings → Privacy &amp; Security → Device Encryption to see if it's on.</p>
+
+        <h3>Attempt 4: Decrypt From Inside Windows</h3>
+        <p>Since Ubuntu couldn't crack the BitLocker encryption, I went back to Windows. I changed the BIOS settings back to the original RST/VMD mode (because Windows was installed expecting that configuration — changing to AHCI after installation can cause a boot failure since the Windows registry still has the RST driver set as the boot-critical storage driver), forced my way into a barely-functional Windows desktop, and ran <code>manage-bde -off D:</code> to start decrypting the partition.</p>
+        <p>It started... and then the system crashed. Every time I tried to access the D: drive, the laptop would blue screen. The decryption got stuck at roughly 25%. I left it running overnight hoping it would inch forward, but the system was just too unstable.</p>
+
+        <h3>Attempt 5: Clean Reinstall — Also Failed</h3>
+        <p>At this point I thought: fine, I'll just wipe C: and do a fresh Windows install, then access D: from the new installation. But the Windows installer couldn't see my drive either — same VMD issue as Ubuntu. The installer doesn't ship with Intel VMD drivers.</p>
+        <p>I clicked "Load driver," browsed to the Intel RST driver I'd downloaded from HP's support page (<code>sp111776.exe</code>, extracted with 7-Zip into nested subfolders), selected the <code>Intel RST VMD Controller 9A0B (TGL)</code> — TGL stands for Tiger Lake, and <code>9A0B</code> is the PCI device ID for the Tiger Lake VMD controller — and the drive appeared. But the actual installation kept failing. It would get to 15% and crash. Corrupted partitions, bad sectors from all the forced shutdowns (the SMART diagnostic showed 63 unsafe shutdowns), or perhaps a storage space issue — I'm still not entirely sure.</p>
+        <p>I even considered using <code>diskpart</code> from <code>Shift+F10</code> to <code>clean</code> the disk and repartition, but that would have destroyed the D: partition I was trying to save.</p>
+        <p><strong>What <code>iaStorVD</code> means:</strong> During this process I kept seeing this filename in the driver folders. <code>iaStorVD</code> stands for Intel (i) Advanced (a) Storage (Stor) Volume Management Device (VD) — it's the actual driver file (<code>iaStorVD.inf</code> / <code>iaStorVD.sys</code>) that tells the Windows installer how to communicate with your NVMe drive through Intel's VMD layer. The driver folders had three versions:</p>
+        <ul>
+          <li><strong><code>F6</code></strong> — For use <em>during</em> Windows Setup, named after the legacy F6 key shortcut from the floppy disk era when you'd press F6 to load SCSI/RAID drivers at install time. Contains just the bare <code>.inf</code> and <code>.sys</code> files.</li>
+          <li><strong><code>dchu_VMD</code></strong> — The full VMD driver for installing <em>after</em> Windows is running. DCHU stands for <strong>D</strong>eclarative, <strong>C</strong>omponentized, <strong>H</strong>ardware Support Apps, and <strong>U</strong>niversal — Microsoft's modern driver packaging standard (introduced with Windows 10 1809).</li>
+          <li><strong><code>dchu_Hsa</code></strong> — The Hardware Support App component. This is the companion service layer that enables Intel Optane Memory and Storage Management UI on top of the driver.</li>
+        </ul>
+        <p>The <code>F6</code> version is what you need during installation.</p>
+
+        <h2>The Solution That Actually Worked</h2>
+        <p>After a full day of failed attempts, I woke up the next morning and decided to stop trying to rescue Windows. I didn't need the operating system. I just needed the files.</p>
+
+        <h3>Step 1: Boot the Windows Installer</h3>
+        <p>I booted from the Windows 11 USB installer I'd created with <code>wimlib</code> — not to install Windows, but to get access to its environment. The Windows Setup program is actually a minimal version of Windows called Windows PE (Preinstallation Environment). It's essentially a stripped-down Windows kernel with a basic shell, running entirely from RAM after loading from the USB. It has a command prompt, basic file management, and — crucially — the ability to load third-party drivers.</p>
+
+        <h3>Step 2: Load the Intel VMD Driver</h3>
+        <p>When the installer reached the "Where do you want to install Windows?" screen, my dad's NVMe drive was invisible — just like before. I clicked "Load driver," browsed to the <code>F6</code> folder containing the Intel RST VMD driver (<code>iaStorVD.inf</code>), and selected <code>Intel RST VMD Controller 9A0B (TGL)</code>. The drive appeared immediately.</p>
+        <p><strong>Tip:</strong> If you see both <code>Intel RST VMD Controller 9A0B (TGL)</code> and <code>Intel RST VMD Managed Controller 09AB</code> in the driver list, pick the first one. The <code>9A0B</code> device ID matches Tiger Lake (11th gen). The <code>09AB</code> is a different platform.</p>
+        <p><strong>Why this matters:</strong> The Windows installer environment, once you load the right driver, can see and interact with your drive — even if the Windows <em>installation on that drive</em> is completely broken. You're essentially borrowing the installer's mini-operating system to do file operations.</p>
+
+        <h3>Step 3: Open Command Prompt</h3>
+        <p>Instead of proceeding with the installation (which I knew would fail), I pressed <strong>Shift + F10</strong>. This opens a Command Prompt window directly from the Windows installer. From here, I had full access to the file system.</p>
+
+        <h3>Step 4: Copy the Files</h3>
+        <p>I plugged in my external SSD, which appeared as <code>F:</code>. My dad's files were on <code>E:</code> (drive letters in the Windows PE environment don't always match what they were inside Windows — PE assigns letters sequentially based on partition order and type). I ran:</p>
+<pre><code>xcopy "E:\\Dokumen Kantor" "F:\\Dokumen Kantor" /E /H /I
+</code></pre>
+        <p>The flags: <code>/E</code> copies all subdirectories including empty ones, <code>/H</code> includes hidden and system files, and <code>/I</code> tells xcopy the destination is a directory (suppressing the "Is this a file or directory?" prompt). You could also use <code>robocopy "E:\\Dokumen Kantor" "F:\\Dokumen Kantor" /E</code> for the same result — <code>robocopy</code> (Robust File Copy) is generally more reliable for large transfers and can resume if interrupted, with automatic retry logic.</p>
+        <p><strong>Scrolling in Windows PE Command Prompt:</strong> You can use <code>Page Up</code> / <code>Page Down</code> to scroll, or <code>Ctrl+Home</code> to jump to the top of the buffer. If you need more scrollback, right-click the title bar → Properties → Layout → increase the Screen Buffer Size height.</p>
+        <p>The files copied successfully. Three years of my dad's work documents, recovered in under five minutes once I had the right approach.</p>
+
+        <h2>But Wait — What About the Encryption?</h2>
+        <p>This is the part that surprised me. Remember, Ubuntu couldn't read the D: partition because of BitLocker. But the Windows installer environment — running from the USB, with the VMD driver loaded — could see the files on the encrypted partition <em>without asking for a recovery key</em>.</p>
+        <p>Here's why: the TPM chip. BitLocker Device Encryption uses the TPM to automatically unlock the drive during a trusted boot sequence. The TPM stores the Volume Master Key (VMK) sealed against specific PCR (Platform Configuration Register) values — measurements of the boot chain including the UEFI firmware, bootloader, and early boot components. The Windows PE environment on the USB, combined with the laptop's own TPM hardware, was apparently sufficient to satisfy the trust chain. The TPM recognized the hardware as legitimate and released the encryption key transparently. This wouldn't have worked from Ubuntu because Linux doesn't participate in the Windows TPM trust chain — the PCR measurements don't match.</p>
+        <p>This is also why the files were accessible even though <code>manage-bde</code> had shown "No key protectors found" — the TPM-based protector was handling things silently at the hardware level, below what the software-level commands could report in the laptop's degraded state.</p>
+
+        <h2>The Bigger Picture: A Day of Technical Rabbit Holes</h2>
+        <p>The file recovery wasn't the only thing I was doing on February 7th. Between troubleshooting sessions, I was also:</p>
+        <p><strong>Scanning my home network</strong> using <code>arp -a</code> (which reads the ARP cache — the mapping of IP addresses to MAC addresses on the local subnet) and <code>nmap</code> (Network Mapper, installed via Homebrew) to discover devices on my <code>192.168.100.0/24</code> network. Found 27 active devices. Each MAC address's first three octets (the OUI — Organizationally Unique Identifier) identify the manufacturer: <code>dc:a6:32</code> maps to Raspberry Pi Foundation (Broadcom).</p>
+        <p><strong>Setting up a Raspberry Pi 4 Model B</strong> that I'd forgotten the password to. Found it at <code>192.168.100.56</code> via mDNS (<code>raspberrypi.local</code>). The Pi 4 uses a Broadcom BCM2711 SoC (System on Chip) — you can confirm the model by checking the <code>.dtb</code> (Device Tree Blob) files on the boot partition: <code>bcm2711-rpi-4-b.dtb</code> = Pi 4 Model B. I reflashed the SD card using Raspberry Pi Imager. The SD card has two partitions: a FAT32 boot partition (~537MB, containing the kernel, device tree, and <code>config.txt</code>) and a Linux ext4 root partition (~5.9GB, containing the actual OS filesystem). macOS can mount FAT32 natively but cannot read ext4 without third-party drivers.</p>
+        <p><strong>Installing Claude Code on the Raspberry Pi</strong> via npm — which turned into its own debugging session. The global npm install failed with permissions issues (a classic Linux problem), fixed by creating a custom prefix directory (<code>mkdir ~/.npm-global &amp;&amp; npm config set prefix '~/.npm-global'</code>), then adding the <code>bin</code> directory to <code>$PATH</code> in <code>.bashrc</code>. Hit a nested directory bug where <code>bin/</code> and <code>lib/</code> ended up in <code>~/.npm-global/npm-global/</code> instead of <code>~/.npm-global/</code> — fixed with <code>mv npm-global/* . &amp;&amp; rm -rf npm-global</code>. A reminder that even simple package installations on ARM Linux can have unexpected PATH and permissions quirks.</p>
+        <p>The point of mentioning all this: every one of these tasks exercised the same fundamental skill — understanding the layers between software and hardware. Whether it's <code>dd</code> writing raw blocks to a disk, VMD abstracting NVMe controllers, BitLocker sealing keys in TPM PCRs, or npm resolving PATH lookups through shell configuration — it's all about knowing which layer you're operating at and what each layer expects.</p>
+
+        <h2>Key Takeaways</h2>
+        <ol>
+          <li><strong>Don't get tunnel vision on fixing the OS.</strong> I spent hours trying to repair, reset, and reinstall Windows. The goal was never to have a working Windows — it was to get the files out. Once I reframed the problem, the solution was straightforward.</li>
+          <li><strong>The Windows installer is a powerful recovery tool.</strong> You don't need Linux, third-party tools, or a second computer running a specialized recovery OS. The Windows installer's PE environment + Command Prompt + the right storage drivers can do the job.</li>
+          <li><strong>Intel VMD is the silent gatekeeper.</strong> On modern Intel laptops (11th gen / Tiger Lake and newer), VMD acts as a middleman between your NVMe drive and the OS. Without the right driver (<code>iaStorVD</code>), your drive is invisible — to the Windows installer, to Linux, to everything. Always have the Intel RST driver handy. You can get it from your laptop manufacturer's support page (for my HP, it was <code>sp111776.exe</code>) or directly from Intel. Extract with 7-Zip, look for the <code>F6</code> subfolder.</li>
+          <li><strong>Windows 11 silently encrypts your drive — and that can bite you.</strong> Device Encryption activates automatically on hardware with TPM 2.0. If you use a local account instead of a Microsoft account, your recovery key may never get backed up anywhere. The TPM-sealed key is invisible to <code>manage-bde</code> when the system is degraded. Check Settings → Privacy &amp; Security → Device Encryption to see if it's on. If it is, back up your recovery key <em>immediately</em>.</li>
+          <li><strong><code>dd</code> works for Linux ISOs but NOT for Windows ISOs.</strong> Linux ISOs are hybrid images with embedded MBR/GPT structures. Windows ISOs are UDF optical disc images. For Windows, you need to format the USB (FAT32 with MBR), mount the ISO, copy the files, and handle <code>install.wim</code> splitting if it exceeds 4GB. Use <code>wimlib-imagex split</code> on macOS.</li>
+          <li><strong>Shift + F10 is the most underrated shortcut in Windows.</strong> During any Windows Setup screen, <code>Shift + F10</code> opens Command Prompt. From there you can run <code>diskpart</code>, <code>xcopy</code>, <code>robocopy</code>, <code>chkdsk</code>, <code>manage-bde</code>, or pretty much anything else. It's your emergency Swiss Army knife.</li>
+          <li><strong>Keep a Windows installer USB in a drawer.</strong> It costs nothing. A 16GB flash drive with the Windows 11 installer is the single most useful recovery tool you can have for a Windows PC. On macOS: install <code>wimlib</code> via Homebrew, format the USB as MBR/FAT32 with <code>diskutil eraseDisk</code>, mount the ISO, <code>rsync</code> everything except <code>install.wim</code>, then <code>wimlib-imagex split</code> the WIM file into <code>.swm</code> chunks under 4GB.</li>
+          <li><strong>Know your models.</strong> I used Claude Haiku 4.5 for the initial USB creation — it led me down the <code>dd</code> path that works for Linux but not Windows, and then tried to download Balena Etcher when that failed. Switching to Claude Opus gave me the <code>wimlib</code> approach immediately. For complex multi-step technical tasks, the reasoning capability of the model matters. (Though Haiku was perfectly fine for the Ubuntu USB and Raspberry Pi setup.)</li>
+          <li><strong>SMART data tells you the truth.</strong> Running <code>smartctl -a /dev/nvme0n1</code> from Ubuntu confirmed that my dad's SSD was physically healthy — 100% available spare, zero data integrity errors, only 1% wear. The 63 unsafe shutdowns explained the file system corruption. The hardware was fine; it was the software that broke. That gave me confidence to keep trying rather than give up and send it to a professional data recovery service.</li>
+        </ol>
+
+        <h2>Technical Glossary</h2>
+        <table>
+          <thead>
+            <tr><th>Term</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>KMODE_EXCEPTION_NOT_HANDLED</code></td><td>Kernel-mode BSOD: an unhandled exception in Ring 0 code</td></tr>
+            <tr><td><code>SrtTrail.txt</code></td><td>Startup Repair Trail log — indicates WinRE repair failed</td></tr>
+            <tr><td>NVMe</td><td>Non-Volatile Memory Express — protocol for SSDs via PCIe</td></tr>
+            <tr><td>VMD</td><td>Volume Management Device — Intel's NVMe abstraction layer</td></tr>
+            <tr><td>AHCI</td><td>Advanced Host Controller Interface — standard storage mode</td></tr>
+            <tr><td>RST / IRST</td><td>(Intel) Rapid Storage Technology — Intel's storage driver layer</td></tr>
+            <tr><td><code>iaStorVD</code></td><td>Intel Advanced Storage Volume Device driver</td></tr>
+            <tr><td>TPM 2.0</td><td>Trusted Platform Module — hardware security chip for key sealing</td></tr>
+            <tr><td>PCR</td><td>Platform Configuration Register — TPM measurement slots</td></tr>
+            <tr><td>VMK</td><td>Volume Master Key — BitLocker's per-volume encryption key</td></tr>
+            <tr><td>BitLocker</td><td>Windows full-disk encryption, can be TPM-sealed</td></tr>
+            <tr><td>WinRE</td><td>Windows Recovery Environment</td></tr>
+            <tr><td>Windows PE</td><td>Windows Preinstallation Environment — minimal Windows from USB</td></tr>
+            <tr><td><code>wimlib</code></td><td>Open-source library for manipulating WIM (Windows Image) files</td></tr>
+            <tr><td><code>.swm</code></td><td>Split Windows Image — WIM chunks for FAT32 compatibility</td></tr>
+            <tr><td><code>.wim</code></td><td>Windows Image format — compressed OS image</td></tr>
+            <tr><td>MBR</td><td>Master Boot Record — legacy partition table scheme</td></tr>
+            <tr><td>GPT</td><td>GUID Partition Table — modern UEFI partition table</td></tr>
+            <tr><td>FAT32</td><td>File Allocation Table (32-bit) — 4GB file size limit</td></tr>
+            <tr><td>exFAT</td><td>Extended FAT — no practical file size limit, cross-platform</td></tr>
+            <tr><td>NTFS</td><td>New Technology File System — Windows native</td></tr>
+            <tr><td>ext4</td><td>Fourth Extended Filesystem — Linux native</td></tr>
+            <tr><td>UDF</td><td>Universal Disk Format — optical disc filesystem</td></tr>
+            <tr><td><code>dd</code></td><td>Data Duplicator — raw block-level copy tool</td></tr>
+            <tr><td><code>/dev/rdisk</code></td><td>macOS raw disk device — bypasses buffer cache for faster I/O</td></tr>
+            <tr><td><code>bs=4m</code></td><td>Block size parameter for dd (4MB per read/write op)</td></tr>
+            <tr><td><code>SIGINFO</code> / <code>Ctrl+T</code></td><td>macOS signal to query process status (dd progress)</td></tr>
+            <tr><td><code>isohybrid</code></td><td>Tool that makes ISOs bootable from both optical and USB media</td></tr>
+            <tr><td>DCHU</td><td>Declarative, Componentized, Hardware Support Apps, Universal</td></tr>
+            <tr><td>TGL</td><td>Tiger Lake — Intel's 11th-gen CPU microarchitecture</td></tr>
+            <tr><td><code>9A0B</code></td><td>PCI device ID for Tiger Lake VMD controller</td></tr>
+            <tr><td><code>diskpart</code></td><td>Windows CLI disk partitioning tool</td></tr>
+            <tr><td><code>diskutil</code></td><td>macOS CLI disk management utility</td></tr>
+            <tr><td><code>manage-bde</code></td><td>BitLocker Drive Encryption CLI management tool</td></tr>
+            <tr><td><code>dislocker</code></td><td>Linux FUSE tool for mounting BitLocker volumes</td></tr>
+            <tr><td>FUSE</td><td>Filesystem in Userspace — Linux kernel module for custom FS</td></tr>
+            <tr><td><code>nmap</code></td><td>Network Mapper — network discovery and security scanning</td></tr>
+            <tr><td><code>arp -a</code></td><td>Display ARP cache (IP ↔ MAC address mappings)</td></tr>
+            <tr><td>OUI</td><td>Organizationally Unique Identifier — first 3 MAC octets</td></tr>
+            <tr><td>mDNS</td><td>Multicast DNS — <code>.local</code> hostname resolution (Bonjour/Avahi)</td></tr>
+            <tr><td>BCM2711</td><td>Broadcom SoC used in Raspberry Pi 4 Model B</td></tr>
+            <tr><td><code>.dtb</code></td><td>Device Tree Blob — hardware description file for ARM Linux</td></tr>
+            <tr><td>SMART</td><td>Self-Monitoring, Analysis and Reporting Technology (disk health)</td></tr>
+            <tr><td>OOBE</td><td>Out-of-Box Experience — Windows initial setup wizard</td></tr>
+            <tr><td>CSM</td><td>Compatibility Support Module — UEFI legacy BIOS fallback</td></tr>
+            <tr><td>UEFI</td><td>Unified Extensible Firmware Interface — modern BIOS replacement</td></tr>
+            <tr><td>Ring 0 / Ring 3</td><td>CPU privilege levels — kernel mode vs user mode</td></tr>
+            <tr><td><code>rsync</code></td><td>Remote (and local) file synchronization tool</td></tr>
+            <tr><td><code>robocopy</code></td><td>Robust File Copy — Windows advanced file copy utility</td></tr>
+            <tr><td><code>xcopy</code></td><td>Extended Copy — Windows file copy with subdirectory support</td></tr>
+            <tr><td><code>sfc /scannow</code></td><td>System File Checker — scans and repairs Windows system files</td></tr>
+            <tr><td>DISM</td><td>Deployment Image Servicing and Management</td></tr>
+            <tr><td><code>bootrec</code></td><td>Boot Record repair utility (fixmbr, fixboot, rebuildbcd)</td></tr>
+            <tr><td><code>chkdsk</code></td><td>Check Disk — Windows filesystem integrity checker</td></tr>
+            <tr><td><code>7zz</code></td><td>7-Zip CLI — archive extraction (used for <code>.exe</code> driver packages)</td></tr>
+            <tr><td>npm prefix</td><td>npm config setting that controls global install location</td></tr>
+            <tr><td><code>$PATH</code></td><td>Shell environment variable listing executable search directories</td></tr>
+            <tr><td><code>.bashrc</code></td><td>Bash shell configuration file, sourced on interactive login</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Final Thoughts</h2>
+        <p>Looking back, the successful approach was almost embarrassingly simple compared to everything else I tried. Boot from USB. Load driver. Open command prompt. Copy files. Done.</p>
+        <p>But I don't regret the long road. I now understand what VMD does and why drives disappear. I understand that BitLocker Device Encryption can be invisible and dangerous. I know the difference between AHCI and RST mode, between the F6 driver and the DCHU driver, between <code>iaStorVD.inf</code> and the management layers above it. I know that <code>dd</code> writes raw blocks and that's why it works for Linux ISOs (which are hybrid images) but not Windows ISOs (which are UDF). I know that <code>SrtTrail.txt</code> means Startup Repair has given up, and that a system crashing at the same SFC percentage every time means the corruption is in the specific files being scanned at that point.</p>
+        <p>I also learned that AI models aren't interchangeable for complex tasks — Haiku is fast and great for straightforward operations, but for multi-step technical troubleshooting with edge cases, Opus's deeper reasoning made the difference. And I learned that sometimes the most productive thing you can do is sleep on it and reframe the problem in the morning.</p>
+        <p>Most importantly: I got my dad's files back. The "Dokumen Kantor" folder is safe on my external SSD. And the next time a Windows PC goes down — mine, my dad's, anyone's — I know exactly where to start.</p>
+      </div>
+
+      <div class="post-nav">
+        <a href="index.html">&larr; Back to all posts</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="mailto:hello@alvin.id">Email</a>
+          <a href="https://github.com/vnby" target="_blank">GitHub</a>
+          <a href="https://www.linkedin.com/in/alvin-abyan" target="_blank">LinkedIn</a>
+        </div>
+        <div class="footer-copy">&copy; 2025 Alvin Abyan</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
