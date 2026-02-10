@@ -1,0 +1,24 @@
+/* Main stylesheet — imports handled in HTML */
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-text);
+  color: var(--color-background);
+}
+
+/* Scrollbar styling (subtle) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-divider);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
