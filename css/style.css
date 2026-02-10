@@ -199,6 +199,12 @@ p {
   color: var(--text-tertiary);
 }
 
+.section-subtitle {
+  margin-top: var(--space-sm);
+  max-width: 720px;
+  color: var(--text-secondary);
+}
+
 .section-header-row {
   display: flex;
   align-items: baseline;
