@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alvin Abyan</title>
+  <meta name="description" content="Product manager crafting elegant, high-impact products across pricing, inventory, and computer vision." />
+  <meta property="og:title" content="Alvin Abyan" />
+  <meta property="og:description" content="Product manager crafting elegant, high-impact products across pricing, inventory, and computer vision." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script>
     (function(){var t;try{t=localStorage.getItem('theme-preference')}catch(e){}if(!t)t='auto';var r=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',r)})();
@@ -17,24 +22,20 @@
   <!-- Navigation -->
   <nav class="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">Alvin Abyan</a>
-      <button class="nav-toggle" aria-label="Toggle navigation">
+      <a href="/" class="nav-logo">Alvin Abyan</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
         <span></span>
         <span></span>
         <span></span>
       </button>
-      <div class="nav-links">
+      <div class="nav-links" id="primary-nav">
         <a href="#work">Work</a>
         <a href="#experience">Experience</a>
         <a href="#writing">Writing</a>
         <a href="#beyond">Beyond</a>
         <a href="blog/index.html">Blog</a>
         <a href="photography/index.html">Photography</a>
-        <div class="theme-toggle" role="group" aria-label="Theme">
-          <button data-theme-value="auto" class="active" aria-label="Auto theme" title="Auto"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></button>
-          <button data-theme-value="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
-          <button data-theme-value="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-        </div>
+        <button class="theme-toggle" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
       </div>
     </div>
   </nav>
@@ -42,66 +43,69 @@
   <!-- Hero -->
   <header class="hero">
     <div class="container">
-      <div class="hero-content fade-in">
-        <p class="hero-overline">Product Manager &middot; 5+ years</p>
-        <h1 class="hero-title">Building products that<br>solve real problems.</h1>
-        <p class="hero-description">A tech-geek with 5+ years of experience working as a Product Manager. Passionate about building products that solve real problems, with a background spanning pricing systems, inventory management, and academic research in computer vision.</p>
+      <div class="fade-in">
+        <h1 class="hero-name">Alvin Abyan</h1>
+        <p class="hero-description">A tech-geek with 5+ years of experience building products that solve real problems, with a background spanning pricing systems, inventory management, and academic research in computer vision.</p>
         <div class="hero-links">
-          <a href="mailto:malvinabyan@gmail.com" class="hero-cta">Get in touch &rarr;</a>
-          <div class="hero-social">
-            <a href="https://github.com/vnby" target="_blank">GitHub</a>
-            <a href="https://linkedin.com/in/alvinabyan" target="_blank">LinkedIn</a>
-          </div>
+          <a href="mailto:hello@alvin.id">Email</a>
+          <span class="divider">/</span>
+          <a href="https://github.com/vnby" target="_blank">GitHub</a>
+          <span class="divider">/</span>
+          <a href="https://linkedin.com/in/alvin-abyan" target="_blank">LinkedIn</a>
         </div>
       </div>
     </div>
   </header>
 
+  <hr class="section-divider">
+
   <!-- Featured Work -->
-  <section id="work" class="section section--alt">
+  <section id="work" class="section">
     <div class="container">
       <div class="section-header fade-in">
         <span class="section-overline">Featured Work</span>
         <h2>Projects &amp; Publications</h2>
       </div>
-      <div class="card-grid stagger-children">
+      <div class="work-list stagger-children">
 
-        <article class="card fade-in">
-          <div class="card-label">Project</div>
-          <h3 class="card-title">Employee Gathering Point System</h3>
-          <div class="card-org">PT Angkasa Pura II</div>
-          <p class="card-description">Developed the back-end system using Spring framework for the company's gamification of an employee gathering event. Modules include employee registration, team scoring, and grand prize randomization.</p>
-          <p class="card-collaborators">With <a href="https://github.com/izzatr" target="_blank">Izzat Raihan</a> and <a href="https://github.com/harryakbar" target="_blank">Harry Akbar</a></p>
-          <div class="card-footer">
+        <article class="work-item fade-in">
+          <div class="work-item-label">Project</div>
+          <h3 class="work-item-title">Employee Gathering Point System</h3>
+          <div class="work-item-org">PT Angkasa Pura II</div>
+          <p class="work-item-description">Developed the back-end system using Spring framework for the company's gamification of an employee gathering event. Modules include employee registration, team scoring, and grand prize randomization.</p>
+          <p class="work-item-collaborators">With <a href="https://github.com/izzatr" target="_blank">Izzat Raihan</a> and <a href="https://github.com/harryakbar" target="_blank">Harry Akbar</a></p>
+          <div class="work-item-links">
             <a href="https://github.com/vnby/ap2game-backend" target="_blank">Back-end &rarr;</a>
             <a href="https://github.com/vnby/ap2game-frontend" target="_blank">Front-end &rarr;</a>
           </div>
         </article>
 
-        <article class="card fade-in">
-          <div class="card-label">Project</div>
-          <h3 class="card-title">Inventory Management System</h3>
-          <div class="card-org">PT Bhumantara Rekacipta Sarana</div>
-          <p class="card-description">Led the development of an Inventory Management System (IMS) as Project Manager. Modules include Purchase Order, Supplier, Inventory, Procurement, Invoice, and Inventory Audit management.</p>
-          <p class="card-collaborators">With <a href="https://github.com/fildzalarissa" target="_blank">Fildza Larissa</a>, <a href="https://github.com/julioj27" target="_blank">Julio Jaya</a>, <a href="https://github.com/radityanurfadillah" target="_blank">Raditya Nurfadillah</a>, and <a href="https://github.com/chaviazagita" target="_blank">Tengku Chavia</a></p>
+        <article class="work-item fade-in">
+          <div class="work-item-label">Project</div>
+          <h3 class="work-item-title">Inventory Management System</h3>
+          <div class="work-item-org">PT Bhumantara Rekacipta Sarana</div>
+          <p class="work-item-description">Led the development of an Inventory Management System (IMS) as Project Manager. Modules include Purchase Order, Supplier, Inventory, Procurement, Invoice, and Inventory Audit management.</p>
+          <p class="work-item-collaborators">With <a href="https://github.com/fildzalarissa" target="_blank">Fildza Larissa</a>, <a href="https://github.com/julioj27" target="_blank">Julio Jaya</a>, <a href="https://github.com/radityanurfadillah" target="_blank">Raditya Nurfadillah</a>, and <a href="https://github.com/chaviazagita" target="_blank">Tengku Chavia</a></p>
         </article>
 
-        <article class="card fade-in">
-          <div class="card-label">Journal Article</div>
-          <h3 class="card-title"><a href="https://journalofbigdata.springeropen.com/articles/10.1186/s40537-020-00374-x" target="_blank">Automatic LIDAR Building Segmentation Based on DGCNN and Euclidean Clustering</a></h3>
-          <p class="card-description">Published in Journal of Big Data &middot; Springer</p>
-          <p class="card-collaborators">Co-authored with Ahmad Gamal, Ari Wibisono, Satria Bagus Wicaksono, Nur Hamid, Hanif Arif Wisesa, Wisnu Jatmiko &amp; Ronny Ardhianto</p>
+        <article class="work-item fade-in">
+          <div class="work-item-label">Journal Article</div>
+          <h3 class="work-item-title"><a href="https://journalofbigdata.springeropen.com/articles/10.1186/s40537-020-00374-x" target="_blank">Automatic LIDAR Building Segmentation Based on DGCNN and Euclidean Clustering</a></h3>
+          <p class="work-item-description">Published in Journal of Big Data &middot; Springer</p>
+          <p class="work-item-collaborators">Co-authored with Ahmad Gamal, Ari Wibisono, Satria Bagus Wicaksono, Nur Hamid, Hanif Arif Wisesa, Wisnu Jatmiko &amp; Ronny Ardhianto</p>
         </article>
 
-        <article class="card fade-in">
-          <div class="card-label">Patent</div>
-          <h3 class="card-title"><a href="https://scholar.ui.ac.id/en/publications/program-komputer-software-identifikasi-bangunan-pada-data-lidar-m" target="_blank">Program Komputer &ldquo;Software Identifikasi Bangunan Pada Data Lidar Menggunakan Pengolahan Citra&rdquo;</a></h3>
-          <p class="card-collaborators">Co-authored with Ari Wibisono &amp; Wisnu Jatmiko</p>
+        <article class="work-item fade-in">
+          <div class="work-item-label">Patent</div>
+          <h3 class="work-item-title"><a href="https://scholar.ui.ac.id/en/publications/program-komputer-software-identifikasi-bangunan-pada-data-lidar-m" target="_blank">Program Komputer &ldquo;Software Identifikasi Bangunan Pada Data Lidar Menggunakan Pengolahan Citra&rdquo;</a></h3>
+          <p class="work-item-collaborators">Co-authored with Ari Wibisono &amp; Wisnu Jatmiko</p>
         </article>
 
       </div>
     </div>
   </section>
+
+  <hr class="section-divider">
 
   <!-- Experience -->
   <section id="experience" class="section">
@@ -110,78 +114,63 @@
         <span class="section-overline">Background</span>
         <h2>Experience &amp; Skills</h2>
       </div>
-      <div class="experience-layout">
-        <div class="experience-main fade-in">
-          <div class="role-card">
-            <h3>Product Manager</h3>
-            <p class="role-tenure">5+ years experience</p>
+      <div class="experience-content fade-in">
+        <div class="experience-role">
+          <h3>Product Manager</h3>
+          <p class="tenure">5+ years experience</p>
+        </div>
+        <div class="experience-skills">
+          <div class="skills-group">
+            <h4>General</h4>
+            <p>Product Management, Project Management, Stakeholder Management, Team Leadership</p>
           </div>
-          <div class="skills-section">
-            <div class="skills-group">
-              <h4>General</h4>
-              <div class="skill-tags">
-                <span class="skill-tag">Product Management</span>
-                <span class="skill-tag">Project Management</span>
-                <span class="skill-tag">Stakeholder Management</span>
-                <span class="skill-tag">Team Leadership</span>
-              </div>
-            </div>
-            <div class="skills-group">
-              <h4>Domain-Specific</h4>
-              <div class="skill-tags">
-                <span class="skill-tag">Competitor-Based Price Management</span>
-                <span class="skill-tag">Revenue-Based Price Management</span>
-                <span class="skill-tag">User Segmentation-Based Price Management</span>
-                <span class="skill-tag">Experimentation</span>
-              </div>
-            </div>
+          <div class="skills-group">
+            <h4>Domain-Specific</h4>
+            <p>Competitor-Based Price Management, Revenue-Based Price Management, User Segmentation-Based Price Management, Experimentation</p>
           </div>
         </div>
-        <div class="experience-aside fade-in">
-          <div class="education-card">
-            <div class="card-label">Education</div>
-            <h3>Bachelor of Information Systems</h3>
-            <p>Undergraduate</p>
-          </div>
+        <div class="experience-education">
+          <h4>Education</h4>
+          <h3>Bachelor of Information Systems</h3>
+          <p>Undergraduate</p>
         </div>
       </div>
     </div>
   </section>
 
+  <hr class="section-divider">
+
   <!-- Writing -->
-  <section id="writing" class="section section--alt">
+  <section id="writing" class="section">
     <div class="container">
       <div class="section-header fade-in">
         <span class="section-overline">Writing</span>
-        <h2>Latest Posts</h2>
-        <a href="blog/index.html" class="section-link">View all &rarr;</a>
+        <div class="section-header-row">
+          <h2>Latest Posts</h2>
+          <a href="blog/index.html" class="section-link">View all &rarr;</a>
+        </div>
       </div>
-      <div class="post-grid stagger-children">
+          <div class="writing-list stagger-children">
 
-        <article class="post-card fade-in">
-          <div class="post-card-date">January 15, 2025</div>
-          <h3 class="post-card-title"><a href="blog/sample-post.html">Lessons from Five Years of Product Management</a></h3>
-          <p class="post-card-excerpt">Reflecting on half a decade of building products, leading teams, and navigating the messy reality of turning ideas into something people actually use.</p>
-          <a href="blog/sample-post.html" class="post-card-read">Read &rarr;</a>
+        <article class="writing-item fade-in">
+          <div class="writing-item-date">February 8, 2026</div>
+          <h3 class="writing-item-title"><a href="blog/rescuing-dads-files.html">How I Rescued My Dad's Work Files From a Broken Windows 11 Laptop</a></h3>
+          <p class="writing-item-excerpt">A day-long battle with blue screens, BitLocker, missing drivers, and the simple shift that saved the data.</p>
+          <a href="blog/rescuing-dads-files.html" class="writing-item-read">Read <span class="arrow">&rarr;</span></a>
         </article>
 
-        <article class="post-card fade-in">
-          <div class="post-card-date">December 3, 2024</div>
-          <h3 class="post-card-title"><a href="#">On Pricing Strategy and Experimentation</a></h3>
-          <p class="post-card-excerpt">How running experiments on pricing models taught me more about user behavior than any textbook ever could.</p>
-          <a href="#" class="post-card-read">Read &rarr;</a>
-        </article>
-
-        <article class="post-card fade-in">
-          <div class="post-card-date">October 18, 2024</div>
-          <h3 class="post-card-title"><a href="#">What TEDxJakarta Taught Me About Curation</a></h3>
-          <p class="post-card-excerpt">After years of volunteering in the curatorial division, here's what I've learned about selecting ideas worth spreading.</p>
-          <a href="#" class="post-card-read">Read &rarr;</a>
+        <article class="writing-item fade-in">
+          <div class="writing-item-date">January 15, 2025</div>
+          <h3 class="writing-item-title"><a href="blog/sample-post.html">Lessons from Five Years of Product Management</a></h3>
+          <p class="writing-item-excerpt">Reflecting on half a decade of building products, leading teams, and navigating the messy reality of turning ideas into something people actually use.</p>
+          <a href="blog/sample-post.html" class="writing-item-read">Read <span class="arrow">&rarr;</span></a>
         </article>
 
       </div>
     </div>
   </section>
+
+  <hr class="section-divider">
 
   <!-- Beyond Work -->
   <section id="beyond" class="section">
@@ -190,15 +179,15 @@
         <span class="section-overline">Beyond Work</span>
         <h2>Interests &amp; Community</h2>
       </div>
-      <div class="interests-grid stagger-children">
-        <div class="interest-card fade-in">
+      <div class="interests-row stagger-children">
+        <div class="interest-item fade-in">
           <h3>Music</h3>
           <ul>
             <li>Piano</li>
             <li>Electone</li>
           </ul>
         </div>
-        <div class="interest-card fade-in">
+        <div class="interest-item fade-in">
           <h3>Sports</h3>
           <ul>
             <li>Cycling</li>
@@ -206,11 +195,9 @@
             <li>Weightlifting</li>
           </ul>
         </div>
-        <div class="interest-card fade-in">
+        <div class="interest-item fade-in">
           <h3>Photography</h3>
-          <ul>
-            <li><a href="photography/index.html">View gallery &rarr;</a></li>
-          </ul>
+          <a href="photography/index.html">View gallery &rarr;</a>
         </div>
       </div>
       <div class="volunteering-block fade-in">
@@ -233,13 +220,15 @@
     </div>
   </section>
 
+  <hr class="section-divider">
+
   <!-- Contact CTA -->
   <section class="cta-section">
     <div class="container container--narrow">
       <div class="fade-in">
         <h2>Let's connect</h2>
         <p>Interested in working together or just want to say hello?</p>
-        <a href="mailto:malvinabyan@gmail.com" class="cta-button">malvinabyan@gmail.com &rarr;</a>
+        <a href="mailto:hello@alvin.id" class="cta-link">hello@alvin.id</a>
       </div>
     </div>
   </section>
@@ -249,7 +238,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-links">
-          <a href="mailto:malvinabyan@gmail.com">Email</a>
+          <a href="mailto:hello@alvin.id">Email</a>
           <a href="https://github.com/vnby" target="_blank">GitHub</a>
           <a href="https://linkedin.com/in/alvinabyan" target="_blank">LinkedIn</a>
         </div>

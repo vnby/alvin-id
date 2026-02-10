@@ -1,52 +1,63 @@
-// Theme toggle (Auto / Light / Dark)
+// Theme toggle — single-click cycle: auto → light → dark → auto
 (function () {
   var STORAGE_KEY = 'theme-preference';
+  var CYCLE = ['auto', 'light', 'dark'];
 
-  function getStoredPreference() {
+  // SVG icon paths
+  var ICONS = {
+    auto: '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+    light: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+    dark: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+  };
+
+  function getStored() {
     try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
   }
 
-  function setStoredPreference(value) {
-    try { localStorage.setItem(STORAGE_KEY, value); } catch (e) {}
+  function setStored(v) {
+    try { localStorage.setItem(STORAGE_KEY, v); } catch (e) {}
   }
 
-  function getSystemTheme() {
+  function getSystem() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
-  function applyTheme(preference) {
-    var resolved = preference === 'auto' ? getSystemTheme() : preference;
+  function apply(pref) {
+    var resolved = pref === 'auto' ? getSystem() : pref;
     document.documentElement.setAttribute('data-theme', resolved);
   }
 
-  function updateToggleUI(preference) {
-    document.querySelectorAll('.theme-toggle button').forEach(function (btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-theme-value') === preference);
+  function updateIcon(pref) {
+    document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+      var svg = btn.querySelector('svg');
+      if (svg) svg.innerHTML = ICONS[pref] || ICONS.auto;
+      btn.setAttribute('aria-label', pref === 'auto' ? 'Theme: auto' : 'Theme: ' + pref);
     });
   }
 
-  // Initialize on load
-  var preference = getStoredPreference() || 'auto';
-  applyTheme(preference);
-  updateToggleUI(preference);
+  // Initialize
+  var preference = getStored() || 'auto';
+  apply(preference);
+  updateIcon(preference);
 
-  // Listen for OS theme changes (relevant when in auto mode)
+  // OS theme change (for auto mode)
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-    var current = getStoredPreference() || 'auto';
-    if (current === 'auto') {
-      applyTheme('auto');
-    }
+    var current = getStored() || 'auto';
+    if (current === 'auto') apply('auto');
   });
 
-  // Bind toggle buttons
+  // Click handler — cycle through modes
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.theme-toggle button');
+    var btn = e.target.closest('.theme-toggle');
     if (!btn) return;
 
-    var value = btn.getAttribute('data-theme-value');
-    setStoredPreference(value);
-    applyTheme(value);
-    updateToggleUI(value);
+    var current = getStored() || 'auto';
+    var idx = CYCLE.indexOf(current);
+    var next = CYCLE[(idx + 1) % CYCLE.length];
+
+    setStored(next);
+    apply(next);
+    updateIcon(next);
   });
 })();
 
@@ -56,18 +67,26 @@
   var navLinks = document.querySelector('.nav-links');
 
   if (toggle && navLinks) {
+    function setAria() {
+      var expanded = navLinks.classList.contains('active');
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    }
+
     toggle.addEventListener('click', function () {
       toggle.classList.toggle('active');
       navLinks.classList.toggle('active');
+      setAria();
     });
 
-    // Close nav when a link is clicked
     navLinks.querySelectorAll('a').forEach(function (link) {
       link.addEventListener('click', function () {
         toggle.classList.remove('active');
         navLinks.classList.remove('active');
+        setAria();
       });
     });
+
+    setAria();
   }
 })();
 
@@ -100,7 +119,7 @@
     });
   }, {
     threshold: 0.1,
-    rootMargin: '0px 0px -40px 0px'
+    rootMargin: '0px 0px -30px 0px'
   });
 
   fadeElements.forEach(function (el) { observer.observe(el); });
@@ -133,14 +152,10 @@
   closeBtn.addEventListener('click', closeLightbox);
 
   lightbox.addEventListener('click', function (e) {
-    if (e.target === lightbox) {
-      closeLightbox();
-    }
+    if (e.target === lightbox) closeLightbox();
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-      closeLightbox();
-    }
+    if (e.key === 'Escape') closeLightbox();
   });
 })();

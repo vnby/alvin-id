@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog &mdash; Alvin Abyan</title>
+  <meta name="description" content="Writing on product, technology, and systems thinking by Alvin Abyan." />
+  <meta property="og:title" content="Blog — Alvin Abyan" />
+  <meta property="og:description" content="Writing on product, technology, and systems thinking by Alvin Abyan." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css">
   <script>
     (function(){var t;try{t=localStorage.getItem('theme-preference')}catch(e){}if(!t)t='auto';var r=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',r)})();
@@ -30,11 +35,7 @@
         <a href="../#beyond">Beyond</a>
         <a href="index.html">Blog</a>
         <a href="../photography/index.html">Photography</a>
-        <div class="theme-toggle" role="group" aria-label="Theme">
-          <button data-theme-value="auto" class="active" aria-label="Auto theme" title="Auto"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></button>
-          <button data-theme-value="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
-          <button data-theme-value="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-        </div>
+        <button class="theme-toggle" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
       </div>
     </div>
   </nav>
@@ -51,27 +52,20 @@
   <!-- Blog Listing -->
   <main class="blog-list">
     <div class="container">
-      <div class="card-grid stagger-children">
+      <div class="writing-list stagger-children">
 
-        <article class="blog-card fade-in">
+        <article class="blog-entry fade-in">
+          <div class="blog-date">February 8, 2026</div>
+          <h2><a href="rescuing-dads-files.html">How I Rescued My Dad's Work Files From a Broken Windows 11 Laptop</a></h2>
+          <p class="blog-excerpt">A day-long battle with blue screens, BitLocker, missing drivers, and the simple shift that saved the data.</p>
+          <a href="rescuing-dads-files.html" class="read-more">Read &rarr;</a>
+        </article>
+
+        <article class="blog-entry fade-in">
           <div class="blog-date">January 15, 2025</div>
           <h2><a href="sample-post.html">Lessons from Five Years of Product Management</a></h2>
           <p class="blog-excerpt">Reflecting on half a decade of building products, leading teams, and navigating the messy reality of turning ideas into something people actually use.</p>
-          <a href="sample-post.html" class="read-more">Read more &rarr;</a>
-        </article>
-
-        <article class="blog-card fade-in">
-          <div class="blog-date">December 3, 2024</div>
-          <h2><a href="#">On Pricing Strategy and Experimentation</a></h2>
-          <p class="blog-excerpt">How running experiments on pricing models taught me more about user behavior than any textbook ever could.</p>
-          <a href="#" class="read-more">Read more &rarr;</a>
-        </article>
-
-        <article class="blog-card fade-in">
-          <div class="blog-date">October 18, 2024</div>
-          <h2><a href="#">What TEDxJakarta Taught Me About Curation</a></h2>
-          <p class="blog-excerpt">After years of volunteering in the curatorial division, here's what I've learned about selecting ideas worth spreading.</p>
-          <a href="#" class="read-more">Read more &rarr;</a>
+          <a href="sample-post.html" class="read-more">Read &rarr;</a>
         </article>
 
       </div>
@@ -83,7 +77,7 @@
     <div class="container">
       <div class="footer-inner">
         <div class="footer-links">
-          <a href="mailto:malvinabyan@gmail.com">Email</a>
+          <a href="mailto:hello@alvin.id">Email</a>
           <a href="https://github.com/vnby" target="_blank">GitHub</a>
           <a href="https://linkedin.com/in/alvinabyan" target="_blank">LinkedIn</a>
         </div>
