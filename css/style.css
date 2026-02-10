@@ -556,9 +556,10 @@ p {
 
 .ride-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-lg);
   margin-bottom: var(--space-sm);
+  text-align: center;
 }
 
 .ride-charts {
@@ -588,6 +589,7 @@ p {
   font-size: var(--fs-xs);
   color: var(--text-tertiary);
   margin-bottom: 0;
+  text-align: center;
 }
 
 .activity-list {
@@ -622,6 +624,7 @@ p {
   letter-spacing: 0.06em;
   color: var(--text-muted);
   margin-bottom: var(--space-xs);
+  white-space: nowrap;
 }
 
 .stat-value {

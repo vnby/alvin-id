@@ -22,7 +22,7 @@
   <!-- Navigation -->
   <nav class="nav">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">Alvin Abyan</a>
+      <a href="index.html" class="nav-logo">Alvin Abyan</a>
       <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
         <span></span>
         <span></span>
@@ -162,60 +162,19 @@
       <div class="section-header fade-in">
         <span class="section-overline">Outdoors</span>
         <h2>Training Rhythm</h2>
-        <p class="section-lede">Cycling, swimming, and hiking are how I reset. Here’s a Strava-like glimpse of the cadence.</p>
+        <p class="section-lede">Cycling, swimming, and hiking are how I reset. Here are the most memorable workouts.</p>
       </div>
       <div class="outdoor-grid">
-        <div class="outdoor-card fade-in">
-          <h3>Weekly Mix</h3>
-          <div class="activity-list">
-            <div class="activity-row">
-              <span>Cycling</span>
-              <span>3 rides</span>
-            </div>
-            <div class="activity-row">
-              <span>Swimming</span>
-              <span>2 sessions</span>
-            </div>
-            <div class="activity-row">
-              <span>Hiking</span>
-              <span>1 trail</span>
-            </div>
-          </div>
-          <div class="activity-stats">
-            <div>
-              <p class="stat-label">Monthly Distance</p>
-              <p class="stat-value">310 km</p>
-            </div>
-            <div>
-              <p class="stat-label">Elevation</p>
-              <p class="stat-value">4,200 m</p>
-            </div>
-          </div>
-        </div>
-        <div class="outdoor-card fade-in">
-          <h3>Last 8 Weeks</h3>
-          <div class="activity-graph">
-            <div class="activity-bar" style="--value: 62;"><span>W1</span></div>
-            <div class="activity-bar" style="--value: 78;"><span>W2</span></div>
-            <div class="activity-bar" style="--value: 45;"><span>W3</span></div>
-            <div class="activity-bar" style="--value: 70;"><span>W4</span></div>
-            <div class="activity-bar" style="--value: 90;"><span>W5</span></div>
-            <div class="activity-bar" style="--value: 58;"><span>W6</span></div>
-            <div class="activity-bar" style="--value: 66;"><span>W7</span></div>
-            <div class="activity-bar" style="--value: 74;"><span>W8</span></div>
-          </div>
-          <p class="graph-caption">Relative effort score combining distance, elevation, and time.</p>
-        </div>
-        <div class="outdoor-card outdoor-card--wide fade-in" data-ride-card="morning-ride">
+        <div class="outdoor-card fade-in" data-ride-card="morning-ride">
           <div class="ride-header">
             <div>
-              <h3>Morning Ride</h3>
-              <p class="ride-subtitle">A past ride mapped from my GPX history.</p>
+              <h3>Sentul KM0 Ride</h3>
+              <p class="ride-subtitle">Sunrise spin to Sentul’s KM0 landmark.</p>
             </div>
             <div class="ride-pill">Cycling</div>
           </div>
           <div class="ride-map">
-            <img id="ride-map" class="ride-static-map" alt="Morning Ride map">
+            <img class="ride-static-map" src="photography/outdoors/optimized/ride-800.jpg" srcset="photography/outdoors/optimized/ride-400.jpg 400w, photography/outdoors/optimized/ride-800.jpg 800w, photography/outdoors/optimized/ride-1400.jpg 1400w" sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 50vw" width="933" height="1400" loading="lazy" decoding="async" alt="Morning Ride photo">
           </div>
           <div class="ride-stats">
             <div>
@@ -223,33 +182,16 @@
               <p class="stat-value" data-ride-distance="morning-ride">--</p>
             </div>
             <div>
-              <p class="stat-label">Elevation Gain</p>
-              <p class="stat-value" data-ride-elevation="morning-ride">--</p>
+              <p class="stat-label">Max Elevation</p>
+              <p class="stat-value">632 m</p>
             </div>
             <div>
               <p class="stat-label">Duration</p>
               <p class="stat-value" data-ride-duration="morning-ride">--</p>
             </div>
-            <div>
-              <p class="stat-label">Avg Speed</p>
-              <p class="stat-value" data-ride-speed="morning-ride">--</p>
-            </div>
           </div>
-          <div class="ride-charts">
-            <div class="ride-chart">
-              <p class="stat-label">Heart Rate</p>
-              <canvas id="ride-hr" width="420" height="140" aria-label="Heart rate chart"></canvas>
-              <p class="chart-meta" data-ride-hr="morning-ride">Avg -- · Max --</p>
-            </div>
-            <div class="ride-chart">
-              <p class="stat-label">Speed</p>
-              <canvas id="ride-speed" width="420" height="140" aria-label="Speed chart"></canvas>
-              <p class="chart-meta" data-ride-speed-meta="morning-ride">Avg -- · Max --</p>
-            </div>
-          </div>
-          <p class="ride-caption" data-ride-dates="morning-ride">--</p>
         </div>
-        <div class="outdoor-card outdoor-card--wide fade-in" data-ride-card="mt-batur-hike">
+        <div class="outdoor-card fade-in" data-ride-card="mt-batur-hike">
           <div class="ride-header">
             <div>
               <h3>Mount Batur Hike</h3>
@@ -258,7 +200,7 @@
             <div class="ride-pill">Hike</div>
           </div>
           <div class="ride-map">
-            <img id="hike-map" class="ride-static-map" alt="Mount Batur hike map">
+            <img class="ride-static-map" src="photography/outdoors/optimized/hike-800.jpg" srcset="photography/outdoors/optimized/hike-400.jpg 400w, photography/outdoors/optimized/hike-800.jpg 800w, photography/outdoors/optimized/hike-1400.jpg 1400w" sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 50vw" width="1050" height="1400" loading="lazy" decoding="async" alt="Mount Batur hike photo">
           </div>
           <div class="ride-stats">
             <div>
@@ -266,31 +208,14 @@
               <p class="stat-value" data-ride-distance="mt-batur-hike">--</p>
             </div>
             <div>
-              <p class="stat-label">Elevation Gain</p>
-              <p class="stat-value" data-ride-elevation="mt-batur-hike">--</p>
+              <p class="stat-label">Max Elevation</p>
+              <p class="stat-value">1,688 m</p>
             </div>
             <div>
               <p class="stat-label">Duration</p>
               <p class="stat-value" data-ride-duration="mt-batur-hike">--</p>
             </div>
-            <div>
-              <p class="stat-label">Avg Speed</p>
-              <p class="stat-value" data-ride-speed="mt-batur-hike">--</p>
-            </div>
           </div>
-          <div class="ride-charts">
-            <div class="ride-chart">
-              <p class="stat-label">Heart Rate</p>
-              <canvas id="hike-hr" width="420" height="140" aria-label="Heart rate chart"></canvas>
-              <p class="chart-meta" data-ride-hr="mt-batur-hike">Avg -- · Max --</p>
-            </div>
-            <div class="ride-chart">
-              <p class="stat-label">Speed</p>
-              <canvas id="hike-speed" width="420" height="140" aria-label="Speed chart"></canvas>
-              <p class="chart-meta" data-ride-speed-meta="mt-batur-hike">Avg -- · Max --</p>
-            </div>
-          </div>
-          <p class="ride-caption" data-ride-dates="mt-batur-hike">--</p>
         </div>
       </div>
     </div>
