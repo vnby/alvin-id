@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview — Alvin Abyan (All Pages)</title>
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+    img, picture, video, canvas, svg { display: block; max-width: 100%; }
+    input, button, textarea, select { font: inherit; }
+    p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Variables ── */
+    :root {
+      --color-background: #FEFEFE;
+      --color-text: #1A1A1A;
+      --color-text-secondary: #6B6B6B;
+      --color-divider: #E5E5E5;
+      --font-sans: 'Helvetica Neue', 'Arial', sans-serif;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.333rem;
+      --text-xl: 1.777rem;
+      --text-2xl: 2.369rem;
+      --text-3xl: 3.157rem;
+      --text-4xl: 4.209rem;
+      --leading-tight: 1.2;
+      --leading-normal: 1.5;
+      --leading-relaxed: 1.8;
+      --tracking-tight: -0.02em;
+      --tracking-normal: 0;
+      --tracking-wide: 0.05em;
+      --tracking-wider: 0.1em;
+      --font-light: 300;
+      --font-normal: 400;
+      --font-medium: 500;
+      --space-1: 0.5rem;
+      --space-2: 1rem;
+      --space-3: 1.5rem;
+      --space-4: 2rem;
+      --space-6: 3rem;
+      --space-8: 4rem;
+      --space-12: 6rem;
+      --space-16: 8rem;
+      --space-24: 12rem;
+      --space-32: 16rem;
+      --container-narrow: 42rem;
+      --container-medium: 56rem;
+      --container-wide: 90rem;
+      --transition-base: 0.3s ease;
+    }
+
+    /* ── Typography ── */
+    body {
+      font-family: var(--font-sans);
+      font-size: var(--text-base);
+      font-weight: var(--font-light);
+      color: var(--color-text);
+      line-height: var(--leading-normal);
+      background-color: var(--color-background);
+    }
+    h1 { font-size: var(--text-4xl); font-weight: var(--font-medium); letter-spacing: var(--tracking-tight); line-height: var(--leading-tight); }
+    h2 { font-size: var(--text-xl); font-weight: var(--font-normal); letter-spacing: var(--tracking-wide); text-transform: uppercase; line-height: var(--leading-tight); }
+    h3 { font-size: var(--text-lg); font-weight: var(--font-normal); line-height: var(--leading-tight); }
+    p { font-size: var(--text-base); font-weight: var(--font-light); letter-spacing: var(--tracking-normal); line-height: var(--leading-relaxed); max-width: var(--container-narrow); }
+    a { color: var(--color-text); text-decoration: none; transition: opacity var(--transition-base); }
+    a:hover { opacity: 0.7; }
+
+    ::selection { background-color: var(--color-text); color: var(--color-background); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-divider); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-text-secondary); }
+
+    /* ── Homepage ── */
+    .hero { height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .hero h1 { font-size: clamp(3rem, 8vw, 4.209rem); letter-spacing: -0.02em; font-weight: 500; text-align: center; }
+
+    .image-feature { height: 100vh; width: 100%; position: relative; overflow: hidden; }
+    .image-feature img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: contrast(1.05) saturate(0.8) brightness(0.98); }
+
+    .title { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: var(--space-24) var(--space-4); }
+    .title h2 { font-size: var(--text-xl); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 400; margin-bottom: var(--space-2); }
+    .title p { font-size: var(--text-base); color: var(--color-text-secondary); font-weight: 300; }
+
+    .navigation { min-height: 50vh; display: flex; align-items: center; justify-content: center; }
+    .navigation nav { display: flex; gap: var(--space-8); }
+    .navigation a { font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; transition: border-color var(--transition-base); }
+    .navigation a:hover { border-bottom-color: var(--color-text); opacity: 1; }
+
+    /* ── Work Page ── */
+    .work-page { max-width: var(--container-medium); margin: 0 auto; padding: var(--space-24) var(--space-4); }
+    .work-page header { margin-bottom: var(--space-32); text-align: center; }
+    .work-page header h1 { font-size: var(--text-3xl); font-weight: 500; letter-spacing: -0.02em; }
+    .work-section { margin-bottom: var(--space-24); }
+    .work-section h2 { font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-secondary); margin-bottom: var(--space-8); font-weight: 400; }
+    .work-item h3 { font-size: var(--text-lg); font-weight: 400; margin-bottom: var(--space-3); line-height: var(--leading-tight); }
+    .work-item .meta { font-size: var(--text-sm); color: var(--color-text-secondary); font-weight: 300; margin-bottom: var(--space-2); }
+    .work-item .description { font-size: var(--text-base); font-weight: 300; line-height: var(--leading-relaxed); margin-top: var(--space-4); }
+    .work-link { display: inline-block; margin-top: var(--space-4); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.1em; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .divider { border: none; border-top: 1px solid var(--color-divider); margin: var(--space-24) 0; }
+    .page-footer { margin-top: var(--space-32); padding-top: var(--space-12); border-top: 1px solid var(--color-divider); display: flex; justify-content: center; gap: var(--space-8); }
+    .page-footer a { font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.15em; }
+
+    /* ── Contact Page ── */
+    .contact-page { max-width: var(--container-narrow); margin: 0 auto; padding: var(--space-24) var(--space-4); min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+    .contact-page header { text-align: center; margin-bottom: var(--space-32); }
+    .contact-page header h1 { font-size: var(--text-3xl); font-weight: 500; letter-spacing: -0.02em; }
+    .contact-info { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .contact-info .email { font-size: var(--text-xl); font-weight: 300; letter-spacing: 0.02em; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 767px) {
+      :root { --text-4xl: 3rem; --text-3xl: 2.5rem; --text-2xl: 2rem; --space-24: 8rem; --space-32: 10rem; }
+      .hero h1 { font-size: var(--text-3xl); }
+      .navigation nav { flex-direction: column; gap: var(--space-4); text-align: center; }
+      .work-page { padding: var(--space-16) var(--space-3); }
+      .work-page header { margin-bottom: var(--space-24); }
+      .contact-page { padding: var(--space-16) var(--space-3); }
+      .page-footer { margin-top: var(--space-24); gap: var(--space-6); }
+    }
+
+    /* ── Preview-only: page separator ── */
+    .page-break {
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #1A1A1A, transparent);
+      margin: 0;
+      opacity: 0.15;
+    }
+    .page-label {
+      text-align: center;
+      padding: var(--space-6) var(--space-4);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--color-text-secondary);
+      background: #F5F5F5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- PAGE 1: HOMEPAGE                        -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="page-label">Homepage — index.html</div>
+
+  <section class="hero">
+    <h1>Alvin Abyan</h1>
+  </section>
+
+  <section class="image-feature">
+    <img
+      src="photography/optimized/IMG_1376-1400.jpg"
+      alt="">
+  </section>
+
+  <section class="title">
+    <h2>Product Manager</h2>
+    <p>Information Systems</p>
+  </section>
+
+  <section class="navigation">
+    <nav>
+      <a href="#work-page">Work</a>
+      <a href="#contact-page">Contact</a>
+    </nav>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- PAGE 2: WORK                            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="page-break"></div>
+  <div class="page-label" id="work-page">Work — work.html</div>
+
+  <main class="work-page">
+    <header>
+      <h1>Alvin Abyan</h1>
+    </header>
+
+    <section class="work-section">
+      <h2>Research</h2>
+      <div class="work-item">
+        <h3>Automatic LIDAR Building Segmentation Based on DGCNN and Euclidean Clustering</h3>
+        <p class="meta">Journal of Big Data, Springer, 2020</p>
+        <a href="https://journalofbigdata.springeropen.com/articles/10.1186/s40537-020-00374-x" class="work-link" target="_blank" rel="noopener">View Publication</a>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <section class="work-section">
+      <h2>Patent</h2>
+      <div class="work-item">
+        <h3>EC00202046955</h3>
+        <p class="meta">Software Identifikasi Bangunan Pada Data Lidar</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <section class="work-section">
+      <h2>Product</h2>
+      <div class="work-item">
+        <h3>Inventory Management System</h3>
+        <p class="meta">PT Bhumantara Rekacipta Sarana</p>
+        <p class="description">Project Manager, Team of 5</p>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <a href="#">Home</a>
+      <a href="#contact-page">Contact</a>
+    </footer>
+  </main>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- PAGE 3: CONTACT                         -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="page-break"></div>
+  <div class="page-label" id="contact-page">Contact — contact.html</div>
+
+  <main class="contact-page">
+    <header>
+      <h1>Alvin Abyan</h1>
+    </header>
+
+    <section class="contact-info">
+      <a href="mailto:hello@alvin.id" class="email">hello@alvin.id</a>
+    </section>
+
+    <footer class="page-footer">
+      <a href="#">Home</a>
+      <a href="#work-page">Work</a>
+    </footer>
+  </main>
+
+</body>
+</html>
