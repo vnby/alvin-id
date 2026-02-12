@@ -1423,6 +1423,15 @@ p {
   .work-item {
     grid-template-columns: 1fr;
     gap: var(--space-sm);
+    padding: var(--space-lg) 0;
+  }
+
+  .subsection-title {
+    margin-bottom: var(--space-lg);
+  }
+
+  .professional-block {
+    margin-bottom: var(--space-xl);
   }
 
   .outdoor-card--wide {
@@ -1545,5 +1554,19 @@ p {
 
   .hero-links .divider {
     display: none;
+  }
+
+  .travel-item,
+  .work-item {
+    padding: var(--space-md) 0;
+  }
+
+  .subsection-title {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .work-item-title {
+    font-size: 1.25rem;
   }
 }
