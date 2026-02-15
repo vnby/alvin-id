@@ -161,69 +161,6 @@
 })();
 
 (function () {
-  function setupRide(config) {
-    function formatDistance(meters) {
-      if (!meters && meters !== 0) return '--';
-      var km = meters / 1000;
-      return km.toFixed(1) + ' km';
-    }
-
-    function formatDuration(seconds) {
-      if (!seconds && seconds !== 0) return '--';
-      var h = Math.floor(seconds / 3600);
-      var m = Math.round((seconds % 3600) / 60);
-      if (m === 60) { h += 1; m = 0; }
-      return h + 'h ' + m + 'm';
-    }
-
-    function setText(selector, value) {
-      var el = document.querySelector(selector);
-      if (el) el.textContent = value;
-    }
-
-    function getInlineRideData(inlineId) {
-      var el = document.getElementById(inlineId);
-      if (!el) return null;
-      try { return JSON.parse(el.textContent); } catch (e) { return null; }
-    }
-
-    function renderRide(data) {
-      if (!data || !data.points || !data.points.length) return;
-
-      var stats = data.stats || {};
-      setText('[data-ride-distance="' + config.dataId + '"]', formatDistance(stats.totalDistanceMeters));
-      setText('[data-ride-duration="' + config.dataId + '"]', formatDuration(stats.durationSeconds));
-
-    }
-
-    fetch(config.fetchUrl)
-      .then(function (res) {
-        if (!res.ok) throw new Error('Failed to load ride data');
-        return res.json();
-      })
-      .then(function (data) {
-        renderRide(data);
-      })
-      .catch(function () {
-        var inlineData = getInlineRideData(config.inlineId);
-        if (inlineData) renderRide(inlineData);
-      });
-  }
-  var rides = [
-    {
-      dataId: 'morning-ride',
-      inlineId: 'ride-data',
-      fetchUrl: 'data/morning-ride.json'
-    },
-    {
-      dataId: 'mt-batur-hike',
-      inlineId: 'ride-data-mt-batur-hike',
-      fetchUrl: 'data/mt-batur-hike.json'
-    }
-  ];
-
-  rides.forEach(setupRide);
-
   function setupReadingProgress() {
     var bar = document.querySelector('.reading-progress-bar');
     if (!bar) return;
