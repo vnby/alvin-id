@@ -224,6 +224,7 @@ p {
 
 /* ===== Navigation ===== */
 .nav {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   background: var(--bg-nav);
@@ -384,6 +385,7 @@ p {
 
 .hero-links .divider {
   color: var(--border-medium);
+  -webkit-user-select: none;
   user-select: none;
 }
 
