@@ -130,33 +130,140 @@
   var lightbox = document.getElementById('lightbox');
   if (!lightbox) return;
 
+  var galleryImages = Array.prototype.slice.call(document.querySelectorAll('.gallery-item img'));
+  if (!galleryImages.length) return;
+
   var lightboxImg = lightbox.querySelector('img');
   var closeBtn = lightbox.querySelector('.lightbox-close');
+  var prevBtn = lightbox.querySelector('.lightbox-prev');
+  var nextBtn = lightbox.querySelector('.lightbox-next');
+  var currentIndex = -1;
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var touchActive = false;
 
-  document.querySelectorAll('.gallery-item').forEach(function (item) {
-    item.addEventListener('click', function () {
-      var img = item.querySelector('img');
-      if (img) {
-        lightboxImg.src = img.src;
-        lightboxImg.alt = img.alt;
-        lightbox.classList.add('active');
-      }
-    });
+  function getFullSrc(img) {
+    return img.getAttribute('data-full') || img.currentSrc || img.src;
+  }
+
+  function showAt(index) {
+    var total = galleryImages.length;
+    currentIndex = (index + total) % total;
+    var img = galleryImages[currentIndex];
+    lightboxImg.src = getFullSrc(img);
+    lightboxImg.alt = img.alt || '';
+  }
+
+  function openAt(index) {
+    showAt(index);
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  galleryImages.forEach(function (img, index) {
+    var item = img.closest('.gallery-item');
+    if (item) {
+      item.addEventListener('click', function () {
+        openAt(index);
+      });
+      item.setAttribute('tabindex', '0');
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openAt(index);
+        }
+      });
+    } else {
+      img.addEventListener('click', function () {
+        openAt(index);
+      });
+    }
   });
+
+  function isOpen() {
+    return lightbox.classList.contains('active');
+  }
+
+  function goPrev() {
+    if (!isOpen()) return;
+    showAt(currentIndex - 1);
+  }
+
+  function goNext() {
+    if (!isOpen()) return;
+    showAt(currentIndex + 1);
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      goPrev();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      goNext();
+    });
+  }
 
   function closeLightbox() {
     lightbox.classList.remove('active');
     lightboxImg.src = '';
+    currentIndex = -1;
+    document.body.style.overflow = '';
   }
 
-  closeBtn.addEventListener('click', closeLightbox);
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeLightbox();
+    });
+  }
 
   lightbox.addEventListener('click', function (e) {
     if (e.target === lightbox) closeLightbox();
   });
 
+  lightbox.addEventListener('touchstart', function (e) {
+    if (!isOpen() || !e.touches || e.touches.length !== 1) return;
+    var touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchActive = true;
+  }, { passive: true });
+
+  lightbox.addEventListener('touchend', function (e) {
+    if (!touchActive || !isOpen() || !e.changedTouches || !e.changedTouches.length) return;
+    var touch = e.changedTouches[0];
+    var deltaX = touch.clientX - touchStartX;
+    var deltaY = touch.clientY - touchStartY;
+    var absX = Math.abs(deltaX);
+    var absY = Math.abs(deltaY);
+    var minSwipeDistance = 40;
+    var horizontalRatio = 1.2;
+
+    if (absX > minSwipeDistance && absX > absY * horizontalRatio) {
+      if (deltaX < 0) {
+        goNext();
+      } else {
+        goPrev();
+      }
+    }
+
+    touchActive = false;
+  }, { passive: true });
+
+  lightbox.addEventListener('touchcancel', function () {
+    touchActive = false;
+  }, { passive: true });
+
   document.addEventListener('keydown', function (e) {
+    if (!isOpen()) return;
     if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') goPrev();
+    if (e.key === 'ArrowRight') goNext();
   });
 })();
 
