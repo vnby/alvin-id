@@ -23,7 +23,7 @@ The webhook handler lives at `public_html/deploy.php` on the server.
 
 > **Important:** `deploy.php` is intentionally excluded from auto-deployment (it won't overwrite itself). If you modify it locally, you must manually update it on the server via cPanel File Manager.
 
-**Path on server:** `/home/wyihuuag/public_html/deploy.php`
+**Path on server:** `~/public_html/deploy.php`
 
 **To update manually:**
 1. Go to cPanel → File Manager → `public_html/`
@@ -35,3 +35,16 @@ The webhook handler lives at `public_html/deploy.php` on the server.
 - `.github/`
 - `.gitignore`
 - `.DS_Store`
+
+## Logging & alerts
+
+Every deploy writes to `~/deploy.log` (outside `public_html`, not publicly accessible):
+
+```
+[2026-02-20 22:05:00 WIB] [INFO] Deploy started — commit: abc123, pusher: vnby
+[2026-02-20 22:05:08 WIB] [INFO] Deploy successful — commit: abc123
+```
+
+On failure, an email alert is sent automatically with the error details.
+
+**To check the log:** cPanel → File Manager → home directory (not `public_html`) → `deploy.log`
