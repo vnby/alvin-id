@@ -35,7 +35,24 @@ if (($data['ref'] ?? '') !== 'refs/heads/' . DEPLOY_BRANCH) {
     exit('Skipped: not ' . DEPLOY_BRANCH);
 }
 
-// 4. Download the branch ZIP from GitHub
+// 4. Respond to GitHub immediately (avoids 10s webhook timeout)
+//    Then continue deploying in the background.
+$response = json_encode(['status' => 'accepted', 'branch' => DEPLOY_BRANCH]);
+http_response_code(200);
+header('Content-Type: application/json');
+header('Content-Length: ' . strlen($response));
+header('Connection: close');
+echo $response;
+
+if (ob_get_level() > 0) {
+    ob_end_flush();
+}
+flush();
+
+ignore_user_abort(true);
+set_time_limit(120);
+
+// 5. Download the branch ZIP from GitHub
 $zipUrl     = "https://github.com/" . GITHUB_REPO . "/archive/refs/heads/" . DEPLOY_BRANCH . ".zip";
 $tmpZipPath = tempnam(sys_get_temp_dir(), 'gh_deploy_') . '.zip';
 
@@ -44,20 +61,19 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_SSL_VERIFYPEER => true,
-    CURLOPT_TIMEOUT        => 60,
+    CURLOPT_TIMEOUT        => 90,
 ]);
-$zipData = curl_exec($ch);
+$zipData  = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpCode !== 200 || !$zipData) {
-    http_response_code(500);
     exit("Failed to download ZIP (HTTP $httpCode)");
 }
 
 file_put_contents($tmpZipPath, $zipData);
 
-// 5. Extract ZIP to a temp directory
+// 6. Extract ZIP to a temp directory
 $tmpExtractDir = sys_get_temp_dir() . '/gh_deploy_' . uniqid();
 mkdir($tmpExtractDir, 0755, true);
 
