@@ -5,19 +5,11 @@ on:
       - main
 
 jobs:
-  deploy:
+  notify:
     runs-on: ubuntu-latest
     steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v4
-
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ./
-          protocol: ftps
-          port: 21
-          security: loose
+      - name: ✅ Deployment triggered via webhook
+        run: |
+          echo "Push to main detected."
+          echo "GitHub will fire a webhook to https://alvin.id/deploy.php"
+          echo "The server will pull and deploy the latest code automatically."
