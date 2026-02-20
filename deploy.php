@@ -12,10 +12,10 @@ define('DEPLOY_BRANCH',  'main');
 define('DEPLOY_DIR',     __DIR__); // = public_html
 // ─────────────────────────────────────────────────────────────────────────────
 
-// 1. Only accept POST
+// 1. Only accept POST — redirect anything else back to the main site
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    exit('Method Not Allowed');
+    header('Location: https://alvin.id/', true, 301);
+    exit();
 }
 
 // 2. Verify GitHub signature
