@@ -1,8 +1,9 @@
 <?php
 /**
  * GitHub Webhook Deploy Script
- * Triggered by GitHub on every push to the main branch.
- * Place this file in public_html/ and set up a GitHub webhook pointing here.
+ * Responds to GitHub immediately (within 10s timeout), deploys in background.
+ * Logs every deploy to /home/wyihuuag/deploy.log
+ * Sends an email alert on failure.
  */
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
@@ -10,6 +11,32 @@ define('WEBHOOK_SECRET', 'f42f192993ecfb711a29240a0f5775902d3c591e219059ff210ef3
 define('GITHUB_REPO',    'vnby/alvin-id');
 define('DEPLOY_BRANCH',  'main');
 define('DEPLOY_DIR',     __DIR__); // = public_html
+define('ALERT_EMAIL',    'malvinabyan@gmail.com');
+define('LOG_FILE',       '/home/wyihuuag/deploy.log');
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function write_log(string $level, string $message): void
+{
+    $line = '[' . date('Y-m-d H:i:s T') . '] [' . $level . '] ' . $message . PHP_EOL;
+    file_put_contents(LOG_FILE, $line, FILE_APPEND | LOCK_EX);
+}
+
+function alert(string $subject, string $body): void
+{
+    $headers = implode("\r\n", [
+        'From: deploy@alvin.id',
+        'Content-Type: text/plain; charset=UTF-8',
+    ]);
+    mail(ALERT_EMAIL, '[alvin.id] ' . $subject, $body, $headers);
+}
+
+function fail(string $reason): void
+{
+    write_log('ERROR', $reason);
+    alert('Deploy failed', $reason . "\n\nCheck the log: " . LOG_FILE);
+    exit($reason);
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 // 1. Only accept POST — redirect anything else back to the main site
@@ -52,7 +79,12 @@ flush();
 ignore_user_abort(true);
 set_time_limit(120);
 
-// 5. Download the branch ZIP from GitHub
+// 5. Log deploy start
+$commit  = $data['after'] ?? 'unknown';
+$pusher  = $data['pusher']['name'] ?? 'unknown';
+write_log('INFO', "Deploy started — commit: {$commit}, pusher: {$pusher}");
+
+// 6. Download the branch ZIP from GitHub
 $zipUrl     = "https://github.com/" . GITHUB_REPO . "/archive/refs/heads/" . DEPLOY_BRANCH . ".zip";
 $tmpZipPath = tempnam(sys_get_temp_dir(), 'gh_deploy_') . '.zip';
 
@@ -68,19 +100,18 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpCode !== 200 || !$zipData) {
-    exit("Failed to download ZIP (HTTP $httpCode)");
+    fail("Failed to download ZIP from GitHub (HTTP {$httpCode})");
 }
 
 file_put_contents($tmpZipPath, $zipData);
 
-// 6. Extract ZIP to a temp directory
+// 7. Extract ZIP to a temp directory
 $tmpExtractDir = sys_get_temp_dir() . '/gh_deploy_' . uniqid();
 mkdir($tmpExtractDir, 0755, true);
 
 $zip = new ZipArchive();
 if ($zip->open($tmpZipPath) !== true) {
-    http_response_code(500);
-    exit('Failed to open ZIP archive');
+    fail('Failed to open ZIP archive');
 }
 $zip->extractTo($tmpExtractDir);
 $zip->close();
@@ -91,16 +122,14 @@ $repoName      = explode('/', GITHUB_REPO)[1]; // "alvin-id"
 $extractedPath = $tmpExtractDir . '/' . $repoName . '-' . DEPLOY_BRANCH;
 
 if (!is_dir($extractedPath)) {
-    // Fallback: grab the first directory found
     $found = glob($tmpExtractDir . '/*', GLOB_ONLYDIR);
     if (empty($found)) {
-        http_response_code(500);
-        exit('Could not locate extracted directory');
+        fail('Could not locate extracted directory inside ZIP');
     }
     $extractedPath = $found[0];
 }
 
-// 6. Copy files to public_html (skip internal/sensitive items)
+// 8. Copy files to public_html (skip internal/sensitive items)
 $skipList = ['.git', '.github', '.gitignore', '.DS_Store', 'deploy.php'];
 
 function deployFiles(string $src, string $dst, array $skip): void
@@ -113,9 +142,7 @@ function deployFiles(string $src, string $dst, array $skip): void
         $dstPath = $dst . DIRECTORY_SEPARATOR . $item;
 
         if (is_dir($srcPath)) {
-            if (!is_dir($dstPath)) {
-                mkdir($dstPath, 0755, true);
-            }
+            if (!is_dir($dstPath)) mkdir($dstPath, 0755, true);
             deployFiles($srcPath, $dstPath, $skip);
         } else {
             copy($srcPath, $dstPath);
@@ -125,7 +152,7 @@ function deployFiles(string $src, string $dst, array $skip): void
 
 deployFiles($extractedPath, DEPLOY_DIR, $skipList);
 
-// 7. Clean up temp directory
+// 9. Clean up temp directory
 function removeDir(string $dir): void
 {
     foreach (scandir($dir) as $item) {
@@ -138,11 +165,5 @@ function removeDir(string $dir): void
 
 removeDir($tmpExtractDir);
 
-// 8. Done
-http_response_code(200);
-header('Content-Type: application/json');
-echo json_encode([
-    'status'   => 'deployed',
-    'branch'   => DEPLOY_BRANCH,
-    'time'     => date('Y-m-d H:i:s T'),
-]);
+// 10. Log success
+write_log('INFO', "Deploy successful — commit: {$commit}");
