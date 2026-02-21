@@ -1,0 +1,28 @@
+name: Validate deploy.php config
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - deploy.php
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check DEPLOY_BRANCH matches current branch
+        run: |
+          EXPECTED="${{ github.ref_name }}"
+          ACTUAL=$(grep -oP "DEPLOY_BRANCH',\s*'\K\w+" deploy.php)
+
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "❌ deploy.php has DEPLOY_BRANCH='$ACTUAL' but this is the '$EXPECTED' branch."
+            echo "   deploy.php may have been overwritten by a bad merge. Fix it before deploying."
+            exit 1
+          fi
+
+          echo "✅ deploy.php DEPLOY_BRANCH='$ACTUAL' matches branch '$EXPECTED'."

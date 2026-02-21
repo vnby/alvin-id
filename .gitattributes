@@ -1,0 +1,4 @@
+# Prevent deploy.php from being auto-merged across branches.
+# Each branch owns its own deploy.php (different secrets, targets, log paths).
+# Any divergence will surface as a conflict and must be resolved manually.
+deploy.php -merge
