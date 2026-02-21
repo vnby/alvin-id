@@ -199,13 +199,13 @@
 
         <hr>
 
-        <p>There is a specific kind of laziness that drives good engineering decisions. Not the laziness that skips writing tests or names variables <code>x</code>, but the productive kind &mdash; the kind where you think: <em>I don&rsquo;t want to do this manually ever again, so let me spend a weekend automating it.</em></p>
+        <p>There is a specific kind of laziness that drives good engineering decisions. Not the laziness that skips writing tests or names variables <code>x</code>, but the productive kind, the kind where you think: <em>I don&rsquo;t want to do this manually ever again, so let me spend a weekend automating it.</em></p>
 
-        <p>That was my mindset when I decided to set up auto-deployment for my personal website, <a href="https://alvin.id">alvin.id</a>. The site is a static personal page: no frameworks, no build step, just raw HTML, CSS, and a handful of JavaScript files hosted on shared cPanel hosting. The deployment workflow at the time was embarrassingly manual &mdash; edit locally, open cPanel File Manager, upload files one by one, pray nothing broke. It worked, but it felt wrong. Every update to a blog post or a photo caption required a context switch out of my editor and into a browser file manager.</p>
+        <p>That was my mindset when I decided to set up auto-deployment for my personal website, <a href="https://alvin.id">alvin.id</a>. The site is a static personal page: no frameworks, no build step, just raw HTML, CSS, and a handful of JavaScript files hosted on shared cPanel hosting. The deployment workflow at the time was embarrassingly manual, edit locally, open cPanel File Manager, upload files one by one, pray nothing broke. It worked, but it felt wrong. Every update to a blog post or a photo caption required a context switch out of my editor and into a browser file manager.</p>
 
         <p>The goal was simple: <code>git push</code> and the live site updates itself.</p>
 
-        <p>What followed was a ten-day arc through two completely different technical approaches &mdash; one of which hit a wall I couldn&rsquo;t climb, and the other of which I wouldn&rsquo;t have thought of on my own.</p>
+        <p>What followed was a ten-day arc through two completely different technical approaches, one of which hit a wall I couldn&rsquo;t climb, and the other of which I wouldn&rsquo;t have thought of on my own.</p>
 
         <h2>The Obvious Approach: GitHub Actions + FTP</h2>
 
@@ -236,11 +236,11 @@ jobs:
           protocol: ftp
           port: 21</code></pre>
 
-        <p>The logic is clean: checkout the code on a GitHub-managed Ubuntu runner, then use <code>SamKirkland/FTP-Deploy-Action</code> &mdash; a popular GitHub Action that wraps <code>lftp</code> to sync files over FTP &mdash; to push everything to the server. Credentials live in GitHub Secrets, not in the repository. Straightforward.</p>
+        <p>The logic is clean: checkout the code on a GitHub-managed Ubuntu runner, then use <code>SamKirkland/FTP-Deploy-Action</code>, a popular GitHub Action that wraps <code>lftp</code> to sync files over FTP, to push everything to the server. Credentials live in GitHub Secrets, not in the repository. Straightforward.</p>
 
         <p>It didn&rsquo;t work.</p>
 
-        <p>The first error was a protocol mismatch. My hosting required FTPS (FTP over explicit TLS), not plain FTP. Easy fix &mdash; change <code>protocol: ftp</code> to <code>protocol: ftps</code>, set <code>security: loose</code> to handle certificate quirks. The workflow ran again. Still failing, but differently this time. Authentication errors.</p>
+        <p>The first error was a protocol mismatch. My hosting required FTPS (FTP over explicit TLS), not plain FTP. Easy fix, change <code>protocol: ftp</code> to <code>protocol: ftps</code>, set <code>security: loose</code> to handle certificate quirks. The workflow ran again. Still failing, but differently this time. Authentication errors.</p>
 
         <p>This kicked off what I&rsquo;d charitably call a <em>debugging marathon</em>. Over the next five days, the git log tells the full story:</p>
 
@@ -249,25 +249,25 @@ Switch FTP deploy from SamKirkland action to lftp for compatibility
 Use lftp -u flag with env vars for FTP credentials
 Add FTP debug step and relax lftp TLS settings</code></pre>
 
-        <p>Each iteration got closer in a different way, but the authentication kept failing in a way that didn&rsquo;t match a bad-credentials error &mdash; those produce a clear &ldquo;login incorrect.&rdquo; This was something else.</p>
+        <p>Each iteration got closer in a different way, but the authentication kept failing in a way that didn&rsquo;t match a bad-credentials error, those produce a clear &ldquo;login incorrect.&rdquo; This was something else.</p>
 
         <h2>The Real Problem: IP Firewalls</h2>
 
-        <p>Eventually the actual issue surfaced: my hosting provider had an IP whitelist on their FTP server. GitHub Actions runners spin up on ephemeral machines in Microsoft Azure datacenters &mdash; they get a fresh IP every time the workflow runs, from a range of thousands of possible addresses. The hosting provider&rsquo;s FTP only accepted connections from pre-approved IPs. GitHub&rsquo;s runner IPs are not on that list, and there was no practical way to whitelist them all.</p>
+        <p>Eventually the actual issue surfaced: my hosting provider had an IP whitelist on their FTP server. GitHub Actions runners spin up on ephemeral machines in Microsoft Azure datacenters, they get a fresh IP every time the workflow runs, from a range of thousands of possible addresses. The hosting provider&rsquo;s FTP only accepted connections from pre-approved IPs. GitHub&rsquo;s runner IPs are not on that list, and there was no practical way to whitelist them all.</p>
 
-        <p>This is a surprisingly common problem that doesn&rsquo;t show up immediately in the error messages. The FTP connection attempt gets blocked at the firewall level <em>before any credentials are even sent</em>, so you get cryptic authentication failures that look like a credentials issue. The clean workaround is to ask your hosting provider to whitelist GitHub&rsquo;s published IP ranges &mdash; they publish the full list at a JSON endpoint &mdash; but my hosting panel didn&rsquo;t expose that kind of firewall control.</p>
+        <p>This is a surprisingly common problem that doesn&rsquo;t show up immediately in the error messages. The FTP connection attempt gets blocked at the firewall level <em>before any credentials are even sent</em>, so you get cryptic authentication failures that look like a credentials issue. The clean workaround is to ask your hosting provider to whitelist GitHub&rsquo;s published IP ranges, they publish the full list at a JSON endpoint, but my hosting panel didn&rsquo;t expose that kind of firewall control.</p>
 
         <p>After one last cleanup commit noting &ldquo;pending hosting IP whitelist,&rdquo; the FTP approach was a dead end.</p>
 
         <h2>Flipping the Direction</h2>
 
-        <p>This is where the conversation with Claude (the LLM I was using as a collaborator throughout) took an interesting turn. I&rsquo;d been treating this as an FTP problem &mdash; <em>how do I get GitHub to successfully push files to my server?</em> The reframe that came back was: <em>what if the server pulled the files instead?</em></p>
+        <p>This is where the conversation with Claude (the LLM I was using as a collaborator throughout) took an interesting turn. I&rsquo;d been treating this as an FTP problem, <em>how do I get GitHub to successfully push files to my server?</em> The reframe that came back was: <em>what if the server pulled the files instead?</em></p>
 
-        <p>The core insight is about reversing the direction of trust. GitHub Actions couldn&rsquo;t reach my server over FTP because the firewall blocked inbound connections from unknown IPs. But my server could freely make <em>outbound</em> HTTP requests to GitHub &mdash; nothing was blocking that. So instead of GitHub pushing to the server, we make the server pull from GitHub when it receives a signal that new code is ready.</p>
+        <p>The core insight is about reversing the direction of trust. GitHub Actions couldn&rsquo;t reach my server over FTP because the firewall blocked inbound connections from unknown IPs. But my server could freely make <em>outbound</em> HTTP requests to GitHub, nothing was blocking that. So instead of GitHub pushing to the server, we make the server pull from GitHub when it receives a signal that new code is ready.</p>
 
         <p>That signal is a <strong>webhook</strong>.</p>
 
-        <p>GitHub&rsquo;s webhook system lets you configure a URL that GitHub will POST to whenever something happens in your repository &mdash; a push, a pull request merge, a release. The payload contains metadata about the event: the commit hash, the pusher, the branch. Our target: <code>https://alvin.id/deploy.php</code>.</p>
+        <p>GitHub&rsquo;s webhook system lets you configure a URL that GitHub will POST to whenever something happens in your repository, a push, a pull request merge, a release. The payload contains metadata about the event: the commit hash, the pusher, the branch. Our target: <code>https://alvin.id/deploy.php</code>.</p>
 
         <p>The new architecture:</p>
 
@@ -277,7 +277,7 @@ Add FTP debug step and relax lftp TLS settings</code></pre>
 
         <h2>Building deploy.php</h2>
 
-        <p><code>deploy.php</code> is the webhook handler &mdash; a PHP script that lives on the server and does four things when it receives a webhook.</p>
+        <p><code>deploy.php</code> is the webhook handler, a PHP script that lives on the server and does four things when it receives a webhook.</p>
 
         <h3>1. Verify the signature</h3>
 
@@ -292,11 +292,11 @@ if (!hash_equals($expected, $sigHeader)) {
     exit('Forbidden: invalid signature');
 }</code></pre>
 
-        <p>Note the use of <code>hash_equals()</code> instead of <code>===</code>. Regular string comparison is vulnerable to timing attacks &mdash; an attacker can infer characters of the expected hash by measuring how long the comparison takes. <code>hash_equals()</code> always runs in constant time regardless of where the strings diverge.</p>
+        <p>Note the use of <code>hash_equals()</code> instead of <code>===</code>. Regular string comparison is vulnerable to timing attacks, an attacker can infer characters of the expected hash by measuring how long the comparison takes. <code>hash_equals()</code> always runs in constant time regardless of where the strings diverge.</p>
 
         <h3>2. Acknowledge immediately, deploy in background</h3>
 
-        <p>This one bit me. GitHub&rsquo;s webhook system has a <strong>10-second timeout</strong>. If your endpoint doesn&rsquo;t respond with a 200 OK within 10 seconds, GitHub marks the delivery as failed. A full deployment &mdash; downloading a ZIP from GitHub, extracting it, copying files &mdash; takes longer than that.</p>
+        <p>This one bit me. GitHub&rsquo;s webhook system has a <strong>10-second timeout</strong>. If your endpoint doesn&rsquo;t respond with a 200 OK within 10 seconds, GitHub marks the delivery as failed. A full deployment, downloading a ZIP from GitHub, extracting it, copying files, takes longer than that.</p>
 
         <p>The fix is to flush the HTTP response to GitHub first, then continue running the deployment logic with the connection closed:</p>
 
@@ -316,7 +316,7 @@ flush();
 ignore_user_abort(true);
 set_time_limit(120);</code></pre>
 
-        <p>This is a general async pattern: when you receive a request that triggers a long-running job, acknowledge immediately and do the work after. GitHub&rsquo;s webhooks are fire-and-forget from their side &mdash; they just want confirmation the event was received. What you do with it afterwards is your business.</p>
+        <p>This is a general async pattern: when you receive a request that triggers a long-running job, acknowledge immediately and do the work after. GitHub&rsquo;s webhooks are fire-and-forget from their side, they just want confirmation the event was received. What you do with it afterwards is your business.</p>
 
         <h3>3. Download, extract, and copy</h3>
 
@@ -350,7 +350,7 @@ deployFiles($extractedPath, DEPLOY_DIR, $skipList);</code></pre>
 
         <pre><code>$skipList = ['.git', '.github', '.gitignore', '.DS_Store', 'deploy.php'];</code></pre>
 
-        <p>The most important entry: <code>deploy.php</code> itself. If it were overwritten during a deploy, any in-progress execution would be running modified bytecode &mdash; undefined behaviour at best. The consequence is that changes to <code>deploy.php</code> must be manually uploaded via cPanel, but that&rsquo;s a reasonable trade-off for a file that changes rarely.</p>
+        <p>The most important entry: <code>deploy.php</code> itself. If it were overwritten during a deploy, any in-progress execution would be running modified bytecode, undefined behaviour at best. The consequence is that changes to <code>deploy.php</code> must be manually uploaded via cPanel, but that&rsquo;s a reasonable trade-off for a file that changes rarely.</p>
 
         <h2>The Final main.yml</h2>
 
@@ -378,7 +378,7 @@ jobs:
 
         <p>Once the core pipeline worked, there were two more layers to add.</p>
 
-        <p><strong>Security.</strong> The <code>deploy.php</code> URL is public &mdash; it has to be, since GitHub needs to reach it. Any request that isn&rsquo;t a POST gets redirected to <code>alvin.id</code>, which prevents casual browser discovery from revealing anything interesting and reduces noise in the logs.</p>
+        <p><strong>Security.</strong> The <code>deploy.php</code> URL is public, it has to be, since GitHub needs to reach it. Any request that isn&rsquo;t a POST gets redirected to <code>alvin.id</code>, which prevents casual browser discovery from revealing anything interesting and reduces noise in the logs.</p>
 
         <p><strong>Logging and alerts.</strong> A silent deployment pipeline is hard to debug after the fact. Every deploy writes a timestamped entry to <code>~/deploy.log</code>, outside <code>public_html/</code> so it isn&rsquo;t publicly accessible:</p>
 
@@ -398,15 +398,15 @@ git push origin main</code></pre>
 
         <h2>Lessons</h2>
 
-        <p><strong>Debugging misdirects are common with network-layer failures.</strong> The FTP authentication errors were a symptom of a firewall issue, not a credentials issue. When you&rsquo;re stuck on what looks like one type of error, always ask whether the error message is actually describing the root cause &mdash; or just where the failure bubbled up to.</p>
+        <p><strong>Debugging misdirects are common with network-layer failures.</strong> The FTP authentication errors were a symptom of a firewall issue, not a credentials issue. When you&rsquo;re stuck on what looks like one type of error, always ask whether the error message is actually describing the root cause, or just where the failure bubbled up to.</p>
 
-        <p><strong>Reversing the direction of a connection is a useful mental model.</strong> If you can&rsquo;t push to X because X blocks your IPs, ask whether X can pull from you instead. It doesn&rsquo;t always work, but it&rsquo;s a surprisingly underused reframe. The webhook approach is actually a classic pattern for shared hosting &mdash; it just wasn&rsquo;t the first thing I reached for.</p>
+        <p><strong>Reversing the direction of a connection is a useful mental model.</strong> If you can&rsquo;t push to X because X blocks your IPs, ask whether X can pull from you instead. It doesn&rsquo;t always work, but it&rsquo;s a surprisingly underused reframe. The webhook approach is actually a classic pattern for shared hosting, it just wasn&rsquo;t the first thing I reached for.</p>
 
-        <p><strong>LLMs as debugging collaborators change the shape of the work.</strong> Having Claude in the loop didn&rsquo;t mean I stopped thinking about the problem &mdash; it meant I had something to think <em>against</em>. The FTP-to-webhook pivot came out of describing the IP whitelist wall and asking &ldquo;what else is possible?&rdquo; That&rsquo;s a conversation, not a Stack Overflow search. The value isn&rsquo;t in generating code; it&rsquo;s in reframing the problem space when you&rsquo;re tunnel-visioned on one approach.</p>
+        <p><strong>LLMs as debugging collaborators change the shape of the work.</strong> Having Claude in the loop didn&rsquo;t mean I stopped thinking about the problem, it meant I had something to think <em>against</em>. The FTP-to-webhook pivot came out of describing the IP whitelist wall and asking &ldquo;what else is possible?&rdquo; That&rsquo;s a conversation, not a Stack Overflow search. The value isn&rsquo;t in generating code; it&rsquo;s in reframing the problem space when you&rsquo;re tunnel-visioned on one approach.</p>
 
         <p><strong>Simple infrastructure beats clever infrastructure.</strong> The final setup is: a PHP file on a shared host, a webhook configured in GitHub, and a secret key. Nothing to maintain, nothing to update, no external services. The pile of FTP workflow YAML that came before it was more elaborate and less reliable.</p>
 
-        <p>The ten days of commits from <em>Add GitHub Workflows</em> to <em>docs: add logging/alert info</em> are a fairly honest record of how technical decisions actually happen &mdash; not straight-line reasoning from problem to solution, but a series of attempts that teach you what the real problem is.</p>
+        <p>The ten days of commits from <em>Add GitHub Workflows</em> to <em>docs: add logging/alert info</em> are a fairly honest record of how technical decisions actually happen, not straight-line reasoning from problem to solution, but a series of attempts that teach you what the real problem is.</p>
 
         <hr>
 

@@ -195,13 +195,13 @@
 
       <div class="post-content">
 
-        <p><em>A messy, honest account of setting up a staging &rarr; main branch guard &mdash; and the <code>deploy.php</code> collision that took three attempts to fully solve.</em></p>
+        <p><em>A messy, honest account of setting up a staging &rarr; main branch guard, and the <code>deploy.php</code> collision that took three attempts to fully solve.</em></p>
 
         <hr>
 
         <p>The <a href="auto-deploy-webhook.html">last article</a> ended on a clean note: <code>git push origin main</code> and the live site updates itself within fifteen seconds. That felt good. But once the deploy pipeline was working, a natural question followed: <em>what prevents a half-finished change from going straight to production?</em></p>
 
-        <p>Until now, <code>main</code> was the only branch. Every commit landed directly on the live site. For a personal project with one contributor, that is acceptable &mdash; until it isn&rsquo;t. I wanted a <code>staging</code> branch where work could accumulate and be tested before anything touched production. More importantly, I wanted to enforce that rule mechanically, not just by convention.</p>
+        <p>Until now, <code>main</code> was the only branch. Every commit landed directly on the live site. For a personal project with one contributor, that is acceptable, until it isn&rsquo;t. I wanted a <code>staging</code> branch where work could accumulate and be tested before anything touched production. More importantly, I wanted to enforce that rule mechanically, not just by convention.</p>
 
         <p>The goal: <strong>main must only ever receive merges from staging.</strong> No direct pushes. No PRs from feature branches. Not even from myself.</p>
 
@@ -229,7 +229,7 @@ jobs:
           fi
           echo "✅ Source branch is 'staging'. Merge allowed."</code></pre>
 
-        <p>Then you add this check as a required status check in GitHub&rsquo;s branch protection settings, and set <code>enforce_admins: true</code> so the rule applies to everyone, including repo admins. Combined, these two things mean there is literally no mechanism to bypass the gate &mdash; not even me pushing directly from the command line.</p>
+        <p>Then you add this check as a required status check in GitHub&rsquo;s branch protection settings, and set <code>enforce_admins: true</code> so the rule applies to everyone, including repo admins. Combined, these two things mean there is literally no mechanism to bypass the gate, not even me pushing directly from the command line.</p>
 
         <p>That part went smoothly. The harder problem was lurking one step ahead.</p>
 
@@ -237,7 +237,7 @@ jobs:
 
         <p>The deployment architecture from the previous article relies on a <code>deploy.php</code> file that lives on each server. The <code>main</code> server&rsquo;s copy targets the <code>main</code> branch, uses the production webhook secret, and logs to <code>deploy.log</code>. The <code>staging</code> server&rsquo;s copy targets <code>staging</code>, uses a different secret, and logs to <code>deploy-staging.log</code>. They are fundamentally different files that happen to share a name.</p>
 
-        <p>The moment you merge <code>staging</code> into <code>main</code>, git has to decide what to do with <code>deploy.php</code>. Left unchecked, staging&rsquo;s version &mdash; with staging&rsquo;s secret and branch target &mdash; would silently overwrite production&rsquo;s. The production deploy pipeline would start listening for the wrong branch and verify webhooks against the wrong secret.</p>
+        <p>The moment you merge <code>staging</code> into <code>main</code>, git has to decide what to do with <code>deploy.php</code>. Left unchecked, staging&rsquo;s version, with staging&rsquo;s secret and branch target, would silently overwrite production&rsquo;s. The production deploy pipeline would start listening for the wrong branch and verify webhooks against the wrong secret.</p>
 
         <p>Three approaches were tried. Two didn&rsquo;t work. Here is the honest account.</p>
 
@@ -247,19 +247,19 @@ jobs:
 
         <pre><code># deploy.php -merge</code></pre>
 
-        <p>to <code>.gitattributes</code> on both branches and let git handle the rest. Locally, this works perfectly &mdash; any <code>git merge</code> that touches <code>deploy.php</code> produces a conflict you have to resolve manually.</p>
+        <p>to <code>.gitattributes</code> on both branches and let git handle the rest. Locally, this works perfectly, any <code>git merge</code> that touches <code>deploy.php</code> produces a conflict you have to resolve manually.</p>
 
-        <p>The problem: GitHub&rsquo;s pull request merge button doesn&rsquo;t use local git. It uses a server-side merge via the API that doesn&rsquo;t honour <code>.gitattributes</code> merge drivers. When the PR was tested, GitHub reported the merge as <em>clean</em> &mdash; no conflict &mdash; and would have happily overwritten <code>main</code>&rsquo;s <code>deploy.php</code> with staging&rsquo;s. The <code>.gitattributes</code> approach is local-only.</p>
+        <p>The problem: GitHub&rsquo;s pull request merge button doesn&rsquo;t use local git. It uses a server-side merge via the API that doesn&rsquo;t honour <code>.gitattributes</code> merge drivers. When the PR was tested, GitHub reported the merge as <em>clean</em>, no conflict, and would have happily overwritten <code>main</code>&rsquo;s <code>deploy.php</code> with staging&rsquo;s. The <code>.gitattributes</code> approach is local-only.</p>
 
         <h3>Attempt 2: Untrack deploy.php on staging</h3>
 
         <p>If the file isn&rsquo;t tracked on <code>staging</code>, it can&rsquo;t be merged. So: <code>git rm --cached deploy.php</code> on the staging branch, add it to <code>.gitignore</code>, done.</p>
 
-        <p>This created a worse problem. The commit that untracks a file shows as a <em>deletion</em> in git. When that deletion is merged into <code>main</code>, git faithfully applies it &mdash; and deletes <code>main</code>&rsquo;s <code>deploy.php</code> from the repository entirely. We&rsquo;d have traded the wrong file for no file. That PR was closed before it could be merged.</p>
+        <p>This created a worse problem. The commit that untracks a file shows as a <em>deletion</em> in git. When that deletion is merged into <code>main</code>, git faithfully applies it, and deletes <code>main</code>&rsquo;s <code>deploy.php</code> from the repository entirely. We&rsquo;d have traded the wrong file for no file. That PR was closed before it could be merged.</p>
 
         <h3>Attempt 3: The right mental model</h3>
 
-        <p>The mistake in both previous attempts was treating <code>deploy.php</code> as a file that both branches <em>own</em>. The correct framing: <code>main</code> owns <code>deploy.php</code>. Staging does not. The staging server has its own copy, but that copy is a server-side operational file &mdash; not something git should know about.</p>
+        <p>The mistake in both previous attempts was treating <code>deploy.php</code> as a file that both branches <em>own</em>. The correct framing: <code>main</code> owns <code>deploy.php</code>. Staging does not. The staging server has its own copy, but that copy is a server-side operational file, not something git should know about.</p>
 
         <p>The solution is to reset staging&rsquo;s <code>deploy.php</code> to be <em>identical to main&rsquo;s</em> (so there is no diff and no merge conflict), and then add <code>deploy.php</code> to <code>.gitignore</code> on staging to prevent any local staging-specific version from ever being accidentally committed:</p>
 
@@ -269,7 +269,7 @@ jobs:
 # Never commit staging-specific changes, only main's version is tracked.
 deploy.php</code></pre>
 
-        <p>This way, staging&rsquo;s git tree always carries <code>main</code>&rsquo;s <code>deploy.php</code> verbatim. When the merge happens, there is no diff on that file. GitHub sees nothing to reconcile. The staging server&rsquo;s actual <code>deploy.php</code> &mdash; with staging secrets and config &mdash; lives only on disk, managed independently, invisible to git.</p>
+        <p>This way, staging&rsquo;s git tree always carries <code>main</code>&rsquo;s <code>deploy.php</code> verbatim. When the merge happens, there is no diff on that file. GitHub sees nothing to reconcile. The staging server&rsquo;s actual <code>deploy.php</code>, with staging secrets and config, lives only on disk, managed independently, invisible to git.</p>
 
         <h2>The Post-Merge Safety Net</h2>
 
@@ -284,7 +284,7 @@ deploy.php</code></pre>
     fi
     echo "✅ deploy.php config is correct."</code></pre>
 
-        <p>If staging&rsquo;s config ever lands on <code>main</code> &mdash; through any mechanism &mdash; this check fails loudly on the next push. It&rsquo;s a post-merge safety net, not a pre-merge guard, but it means the window of silent misconfiguration is essentially zero.</p>
+        <p>If staging&rsquo;s config ever lands on <code>main</code>, through any mechanism, this check fails loudly on the next push. It&rsquo;s a post-merge safety net, not a pre-merge guard, but it means the window of silent misconfiguration is essentially zero.</p>
 
         <h2>The Final State</h2>
 
@@ -300,9 +300,9 @@ deploy.php</code></pre>
 
         <h2>What Made This Hard</h2>
 
-        <p>The core difficulty was a mismatch between local git behaviour and GitHub&rsquo;s server-side merge. When you run <code>git merge</code> locally, git reads <code>.gitattributes</code> from the working tree and respects every merge driver it finds. When you click &ldquo;Merge pull request&rdquo; on GitHub, a different code path runs that ignores those drivers entirely. Documentation for this discrepancy is sparse &mdash; it tends to surface only after you&rsquo;ve built a solution around the local behaviour and watched it fail in production.</p>
+        <p>The core difficulty was a mismatch between local git behaviour and GitHub&rsquo;s server-side merge. When you run <code>git merge</code> locally, git reads <code>.gitattributes</code> from the working tree and respects every merge driver it finds. When you click &ldquo;Merge pull request&rdquo; on GitHub, a different code path runs that ignores those drivers entirely. Documentation for this discrepancy is sparse, it tends to surface only after you&rsquo;ve built a solution around the local behaviour and watched it fail in production.</p>
 
-        <p>The broader lesson: anything that relies on local git tooling to enforce a policy is not enforced. Policies enforced by GitHub&rsquo;s server-side systems &mdash; required status checks, branch protection rules, restricted push access &mdash; are the ones that actually hold. If a rule can be bypassed by using a different git client or skipping the UI, it is a convention, not a guard.</p>
+        <p>The broader lesson: anything that relies on local git tooling to enforce a policy is not enforced. Policies enforced by GitHub&rsquo;s server-side systems, required status checks, branch protection rules, restricted push access, are the ones that actually hold. If a rule can be bypassed by using a different git client or skipping the UI, it is a convention, not a guard.</p>
 
         <p>The working solution has no clever git tricks. It is branch protection, a shell script in a CI workflow, and a <code>.gitignore</code> entry. Simple things enforced at the right layer.</p>
 
