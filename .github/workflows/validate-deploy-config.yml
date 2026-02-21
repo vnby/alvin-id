@@ -17,7 +17,7 @@ jobs:
       - name: Check DEPLOY_BRANCH matches current branch
         run: |
           EXPECTED="${{ github.ref_name }}"
-          ACTUAL=$(grep -oP "(?<=define\('DEPLOY_BRANCH',\s{0,10}')\w+" deploy.php)
+          ACTUAL=$(grep -oP "DEPLOY_BRANCH',\s*'\K\w+" deploy.php)
 
           if [ "$ACTUAL" != "$EXPECTED" ]; then
             echo "❌ deploy.php has DEPLOY_BRANCH='$ACTUAL' but this is the '$EXPECTED' branch."
