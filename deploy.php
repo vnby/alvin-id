@@ -7,12 +7,12 @@
  */
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-define('WEBHOOK_SECRET', '74e58b8b3cef2a08e4df325dc482abeeb45f0d0490c373142dfb0b29d55eb3bd');
+define('WEBHOOK_SECRET', 'f42f192993ecfb711a29240a0f5775902d3c591e219059ff210ef34a2de4b1cc');
 define('GITHUB_REPO',    'vnby/alvin-id');
-define('DEPLOY_BRANCH',  'staging');
-define('DEPLOY_DIR',     __DIR__); // = staging document root (e.g. public_html/stg.alvin.id)
+define('DEPLOY_BRANCH',  'main');
+define('DEPLOY_DIR',     __DIR__); // = public_html
 define('ALERT_EMAIL',    'malvinabyan@gmail.com');
-define('LOG_FILE',       '/home/wyihuuag/deploy-staging.log');
+define('LOG_FILE',       '/home/wyihuuag/deploy.log');
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -28,20 +28,20 @@ function alert(string $subject, string $body): void
         'From: deploy@alvin.id',
         'Content-Type: text/plain; charset=UTF-8',
     ]);
-    mail(ALERT_EMAIL, '[stg.alvin.id] ' . $subject, $body, $headers);
+    mail(ALERT_EMAIL, '[alvin.id] ' . $subject, $body, $headers);
 }
 
 function fail(string $reason): void
 {
     write_log('ERROR', $reason);
-    alert('[staging] Deploy failed', $reason . "\n\nCheck the log: " . LOG_FILE);
+    alert('Deploy failed', $reason . "\n\nCheck the log: " . LOG_FILE);
     exit($reason);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
 // 1. Only accept POST — redirect anything else back to the main site
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: https://stg.alvin.id/', true, 301);
+    header('Location: https://alvin.id/', true, 301);
     exit();
 }
 
