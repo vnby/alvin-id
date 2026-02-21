@@ -1222,11 +1222,11 @@ p {
 
 .blog-post .post-content a {
   color: var(--accent-strong);
-  text-decoration: underline;
-  text-decoration-color: var(--border-medium);
-  text-underline-offset: 0.15em;
-  text-decoration-thickness: 0.08em;
-  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.16em;
+  transition: color var(--transition-fast), text-decoration-thickness var(--transition-fast);
 }
 
 .blog-post .post-content a:hover,
