@@ -1,2 +1,7 @@
 .DS_Store
 .venv/
+
+# deploy.php holds server-specific secrets and config.
+# The staging server manages its own copy independently.
+# Never commit staging-specific changes — only main's version is tracked.
+deploy.php
