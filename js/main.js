@@ -11,7 +11,10 @@
     'position:fixed;top:0;left:0;right:0;z-index:9999;background:#b45309;color:#fff;text-align:center;font-size:12px;font-family:monospace;padding:4px 0;letter-spacing:0.05em;line-height:1.2;'
   );
   document.body.insertBefore(banner, document.body.firstChild);
-  document.body.style.paddingTop = '24px';
+  var bannerHeight = banner.offsetHeight || 24;
+  document.documentElement.classList.add('staging-banner-active');
+  document.documentElement.style.setProperty('--staging-banner-height', bannerHeight + 'px');
+  document.body.style.paddingTop = bannerHeight + 'px';
 })();
 
 // Theme toggle — single-click cycle: auto → light → dark → auto
