@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website — Alvin Abyan</title>
+  <meta name="description" content="A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
+  <meta property="og:title" content="The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website" />
+  <meta property="og:description" content="A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <script>
+    (function(){var t;try{t=localStorage.getItem('theme-preference')}catch(e){}if(!t)t='light';var r=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',r)})();
+  </script>
+  <style>
+    :root {
+      --bg-primary: #FAFAF7;
+      --bg-nav: rgba(250, 250, 247, 0.92);
+      --accent: #1B4D3E;
+      --accent-strong: #0F2F24;
+      --accent-soft: #E6F0EA;
+      --accent-contrast: #F8FBF8;
+      --text-primary: #1C1917;
+      --text-secondary: #57534E;
+      --text-tertiary: #78716C;
+      --text-muted: #A8A29E;
+      --border-light: #E7E5E4;
+      --border-medium: #D6D3D1;
+      --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --fs-display: 4.5rem;
+      --fs-h1: 2.75rem;
+      --fs-h2: 2rem;
+      --fs-h3: 1.25rem;
+      --fs-body: 1rem;
+      --fs-body-lg: 1.0625rem;
+      --fs-small: 0.875rem;
+      --fs-xs: 0.75rem;
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+      --space-section: 8.75rem;
+      --container-wide: 1080px;
+      --container-narrow: 700px;
+      --nav-height: 56px;
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.3s ease;
+      --transition-slow: 0.5s ease;
+    }
+    [data-theme="dark"] {
+      --bg-primary: #0C0A09;
+      --bg-nav: rgba(12, 10, 9, 0.92);
+      --text-primary: #E7E5E4;
+      --text-secondary: #A8A29E;
+      --text-tertiary: #78716C;
+      --text-muted: #57534E;
+      --border-light: #1C1917;
+      --border-medium: #292524;
+      --accent: #8CDDBB;
+      --accent-strong: #6AC9A4;
+      --accent-soft: #10241B;
+      --accent-contrast: #0F1813;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--text-primary); text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    h1, h2 { font-family: var(--font-serif); font-weight: 400; }
+    h1 { font-size: var(--fs-h1); line-height: 1.15; letter-spacing: -0.01em; }
+    h2 { font-size: var(--fs-h2); line-height: 1.2; margin-bottom: 0; }
+    h3 { font-size: var(--fs-h3); font-weight: 500; letter-spacing: -0.01em; }
+    h4 { font-size: var(--fs-small); font-weight: 500; text-transform: uppercase; color: var(--text-muted); }
+    p { margin-bottom: var(--space-md); color: var(--text-secondary); }
+    .container { max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--space-lg); }
+    .section { padding: var(--space-section) 0; }
+    .nav {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      background: var(--bg-nav);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      padding: 0 var(--space-lg);
+    }
+    .nav-inner {
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      height: var(--nav-height);
+    }
+    .nav-logo { font-family: var(--font-serif); font-weight: 400; font-size: 1.25rem; }
+    .nav-links {
+      display: -webkit-flex;
+      display: flex;
+      gap: 2rem;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+    .nav-links a { font-size: 0.8125rem; color: var(--text-tertiary); }
+    .nav-toggle { display: none; }
+    .fade-in.visible { opacity: 1; -webkit-transform: none; transform: none; }
+    .section-overline { font-family: var(--font-serif); font-style: italic; color: var(--accent); }
+    .footer { padding: var(--space-xl) 0; border-top: 1px solid var(--border-light); }
+    .footer-inner {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      :root { --fs-display: 3rem; --fs-h1: 2.25rem; --fs-h2: 1.5rem; --space-section: 5rem; }
+      .nav-toggle { display: block; background: none; border: none; cursor: pointer; padding: var(--space-sm); }
+      .nav-toggle span { display: block; width: 18px; height: 1.5px; background: var(--text-primary); margin: 4px 0; }
+      .nav-links {
+        position: absolute; top: var(--nav-height); left: 0; right: 0;
+        background: var(--bg-nav);
+        -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+        -webkit-flex-direction: column; flex-direction: column;
+        padding: 0 var(--space-lg); gap: 0;
+        max-height: 0; overflow: hidden;
+      }
+      .nav-links.active { max-height: 400px; padding: var(--space-md) var(--space-lg) var(--space-lg); }
+      .nav-links a { padding: 0.625rem 0; font-size: 0.9375rem; }
+      .footer-inner { -webkit-flex-direction: column; flex-direction: column; gap: var(--space-md); text-align: center; }
+    }
+    @media (max-width: 480px) {
+      :root { --fs-display: 2.5rem; }
+      .container { padding: 0 1.25rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">Alvin Abyan</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="primary-nav">
+        <a href="../index.html#writing">Writing</a>
+        <a href="../index.html#photography">Photography</a>
+        <a href="../index.html#outdoors">Outdoors</a>
+        <a href="../index.html#travel">Travel</a>
+        <a href="../index.html#professional">Professional</a>
+        <a href="index.html">Blog</a>
+        <a href="../photography/index.html">Gallery</a>
+        <button class="theme-toggle" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="reading-progress" aria-hidden="true">
+    <div class="reading-progress-bar"></div>
+  </div>
+
+  <!-- Blog Post -->
+  <article class="blog-post">
+    <div class="container container--narrow">
+      <h1>The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website</h1>
+      <div class="post-meta">February 20, 2026 &middot; 9 min read</div>
+
+      <div class="post-content">
+
+        <p><em>A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made <code>git push</code> enough to deploy.</em></p>
+
+        <hr>
+
+        <p>There is a specific kind of laziness that drives good engineering decisions. Not the laziness that skips writing tests or names variables <code>x</code>, but the productive kind &mdash; the kind where you think: <em>I don&rsquo;t want to do this manually ever again, so let me spend a weekend automating it.</em></p>
+
+        <p>That was my mindset when I decided to set up auto-deployment for my personal website, <a href="https://alvin.id">alvin.id</a>. The site is a static personal page: no frameworks, no build step, just raw HTML, CSS, and a handful of JavaScript files hosted on shared cPanel hosting. The deployment workflow at the time was embarrassingly manual &mdash; edit locally, open cPanel File Manager, upload files one by one, pray nothing broke. It worked, but it felt wrong. Every update to a blog post or a photo caption required a context switch out of my editor and into a browser file manager.</p>
+
+        <p>The goal was simple: <code>git push</code> and the live site updates itself.</p>
+
+        <p>What followed was a ten-day arc through two completely different technical approaches &mdash; one of which hit a wall I couldn&rsquo;t climb, and the other of which I wouldn&rsquo;t have thought of on my own.</p>
+
+        <h2>The Obvious Approach: GitHub Actions + FTP</h2>
+
+        <p>The first solution that came to mind was also the most intuitive one. GitHub Actions can run arbitrary workflows on every push. Shared hosting always exposes FTP access. Connect the two, and every push to <code>main</code> would sync the files to the server. Done.</p>
+
+        <p>On February 10th, I added the first workflow:</p>
+
+        <pre><code>name: 🚀 Deploy to alvin.id
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ./
+          protocol: ftp
+          port: 21</code></pre>
+
+        <p>The logic is clean: checkout the code on a GitHub-managed Ubuntu runner, then use <code>SamKirkland/FTP-Deploy-Action</code> &mdash; a popular GitHub Action that wraps <code>lftp</code> to sync files over FTP &mdash; to push everything to the server. Credentials live in GitHub Secrets, not in the repository. Straightforward.</p>
+
+        <p>It didn&rsquo;t work.</p>
+
+        <p>The first error was a protocol mismatch. My hosting required FTPS (FTP over explicit TLS), not plain FTP. Easy fix &mdash; change <code>protocol: ftp</code> to <code>protocol: ftps</code>, set <code>security: loose</code> to handle certificate quirks. The workflow ran again. Still failing, but differently this time. Authentication errors.</p>
+
+        <p>This kicked off what I&rsquo;d charitably call a <em>debugging marathon</em>. Over the next five days, the git log tells the full story:</p>
+
+        <pre><code>Add FTP debug step to diagnose GitHub Actions auth failure
+Switch FTP deploy from SamKirkland action to lftp for compatibility
+Use lftp -u flag with env vars for FTP credentials
+Add FTP debug step and relax lftp TLS settings</code></pre>
+
+        <p>Each iteration got closer in a different way, but the authentication kept failing in a way that didn&rsquo;t match a bad-credentials error &mdash; those produce a clear &ldquo;login incorrect.&rdquo; This was something else.</p>
+
+        <h2>The Real Problem: IP Firewalls</h2>
+
+        <p>Eventually the actual issue surfaced: my hosting provider had an IP whitelist on their FTP server. GitHub Actions runners spin up on ephemeral machines in Microsoft Azure datacenters &mdash; they get a fresh IP every time the workflow runs, from a range of thousands of possible addresses. The hosting provider&rsquo;s FTP only accepted connections from pre-approved IPs. GitHub&rsquo;s runner IPs are not on that list, and there was no practical way to whitelist them all.</p>
+
+        <p>This is a surprisingly common problem that doesn&rsquo;t show up immediately in the error messages. The FTP connection attempt gets blocked at the firewall level <em>before any credentials are even sent</em>, so you get cryptic authentication failures that look like a credentials issue. The clean workaround is to ask your hosting provider to whitelist GitHub&rsquo;s published IP ranges &mdash; they publish the full list at a JSON endpoint &mdash; but my hosting panel didn&rsquo;t expose that kind of firewall control.</p>
+
+        <p>After one last cleanup commit noting &ldquo;pending hosting IP whitelist,&rdquo; the FTP approach was a dead end.</p>
+
+        <h2>Flipping the Direction</h2>
+
+        <p>This is where the conversation with Claude (the LLM I was using as a collaborator throughout) took an interesting turn. I&rsquo;d been treating this as an FTP problem &mdash; <em>how do I get GitHub to successfully push files to my server?</em> The reframe that came back was: <em>what if the server pulled the files instead?</em></p>
+
+        <p>The core insight is about reversing the direction of trust. GitHub Actions couldn&rsquo;t reach my server over FTP because the firewall blocked inbound connections from unknown IPs. But my server could freely make <em>outbound</em> HTTP requests to GitHub &mdash; nothing was blocking that. So instead of GitHub pushing to the server, we make the server pull from GitHub when it receives a signal that new code is ready.</p>
+
+        <p>That signal is a <strong>webhook</strong>.</p>
+
+        <p>GitHub&rsquo;s webhook system lets you configure a URL that GitHub will POST to whenever something happens in your repository &mdash; a push, a pull request merge, a release. The payload contains metadata about the event: the commit hash, the pusher, the branch. Our target: <code>https://alvin.id/deploy.php</code>.</p>
+
+        <p>The new architecture:</p>
+
+        <pre><code>git push → GitHub → POST webhook → deploy.php → downloads ZIP → extracts to public_html</code></pre>
+
+        <p>No FTP. No inbound connections from GitHub. No IP whitelist needed. The server is in control of its own deployment.</p>
+
+        <h2>Building deploy.php</h2>
+
+        <p><code>deploy.php</code> is the webhook handler &mdash; a PHP script that lives on the server and does four things when it receives a webhook.</p>
+
+        <h3>1. Verify the signature</h3>
+
+        <p>GitHub signs every webhook payload with HMAC-SHA256 using a shared secret you define when setting up the webhook. The script checks this before doing anything else. Without it, anyone who discovers the URL could trigger a fake deployment.</p>
+
+        <pre><code>$payload   = file_get_contents('php://input');
+$sigHeader = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
+$expected  = 'sha256=' . hash_hmac('sha256', $payload, WEBHOOK_SECRET);
+
+if (!hash_equals($expected, $sigHeader)) {
+    http_response_code(403);
+    exit('Forbidden: invalid signature');
+}</code></pre>
+
+        <p>Note the use of <code>hash_equals()</code> instead of <code>===</code>. Regular string comparison is vulnerable to timing attacks &mdash; an attacker can infer characters of the expected hash by measuring how long the comparison takes. <code>hash_equals()</code> always runs in constant time regardless of where the strings diverge.</p>
+
+        <h3>2. Acknowledge immediately, deploy in background</h3>
+
+        <p>This one bit me. GitHub&rsquo;s webhook system has a <strong>10-second timeout</strong>. If your endpoint doesn&rsquo;t respond with a 200 OK within 10 seconds, GitHub marks the delivery as failed. A full deployment &mdash; downloading a ZIP from GitHub, extracting it, copying files &mdash; takes longer than that.</p>
+
+        <p>The fix is to flush the HTTP response to GitHub first, then continue running the deployment logic with the connection closed:</p>
+
+        <pre><code>// Respond 200 immediately so GitHub doesn't time out
+http_response_code(200);
+header('Content-Type: application/json');
+header('Connection: close');
+$responseBody = json_encode(['status' => 'accepted']);
+header('Content-Length: ' . strlen($responseBody));
+echo $responseBody;
+
+// Flush output buffers to actually send the response
+if (ob_get_level()) ob_end_flush();
+flush();
+
+// Continue deploying after GitHub has received the 200
+ignore_user_abort(true);
+set_time_limit(120);</code></pre>
+
+        <p>This is a general async pattern: when you receive a request that triggers a long-running job, acknowledge immediately and do the work after. GitHub&rsquo;s webhooks are fire-and-forget from their side &mdash; they just want confirmation the event was received. What you do with it afterwards is your business.</p>
+
+        <h3>3. Download, extract, and copy</h3>
+
+        <p>With the response flushed, the script downloads the repository as a ZIP from GitHub&rsquo;s archive endpoint, extracts it to a temp directory, and copies everything into <code>public_html/</code>:</p>
+
+        <pre><code>$zipUrl = "https://github.com/" . GITHUB_REPO . "/archive/refs/heads/" . DEPLOY_BRANCH . ".zip";
+$tmpZipPath = tempnam(sys_get_temp_dir(), 'gh_deploy_') . '.zip';
+
+// Download via cURL
+$ch = curl_init($zipUrl);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_SSL_VERIFYPEER => true,
+    CURLOPT_TIMEOUT        => 60,
+]);
+$zipData = curl_exec($ch);
+curl_close($ch);
+
+// Extract and copy files to public_html
+$zip = new ZipArchive();
+$zip->open($tmpZipPath);
+$zip->extractTo($tmpExtractDir);
+$zip->close();
+
+deployFiles($extractedPath, DEPLOY_DIR, $skipList);</code></pre>
+
+        <h3>4. Skip sensitive files</h3>
+
+        <p>Not everything in the repository should end up in <code>public_html/</code>. The skip list ensures the handler never overwrites itself mid-deployment, and keeps git internals and dev tooling off the server:</p>
+
+        <pre><code>$skipList = ['.git', '.github', '.gitignore', '.DS_Store', 'deploy.php'];</code></pre>
+
+        <p>The most important entry: <code>deploy.php</code> itself. If it were overwritten during a deploy, any in-progress execution would be running modified bytecode &mdash; undefined behaviour at best. The consequence is that changes to <code>deploy.php</code> must be manually uploaded via cPanel, but that&rsquo;s a reasonable trade-off for a file that changes rarely.</p>
+
+        <h2>The Final main.yml</h2>
+
+        <p>After all that, here is what the GitHub Actions workflow looks like now:</p>
+
+        <pre><code>name: 🚀 Deploy to alvin.id
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ Deployment triggered via webhook
+        run: |
+          echo "Push to main detected."
+          echo "GitHub will fire a webhook to https://alvin.id/deploy.php"
+          echo "The server will pull and deploy the latest code automatically."</code></pre>
+
+        <p>It does nothing. It is just a log message. The actual work happens on the server side, triggered by the webhook GitHub fires automatically. The workflow exists more as documentation than functionality.</p>
+
+        <h2>Hardening: Security and Observability</h2>
+
+        <p>Once the core pipeline worked, there were two more layers to add.</p>
+
+        <p><strong>Security.</strong> The <code>deploy.php</code> URL is public &mdash; it has to be, since GitHub needs to reach it. Any request that isn&rsquo;t a POST gets redirected to <code>alvin.id</code>, which prevents casual browser discovery from revealing anything interesting and reduces noise in the logs.</p>
+
+        <p><strong>Logging and alerts.</strong> A silent deployment pipeline is hard to debug after the fact. Every deploy writes a timestamped entry to <code>~/deploy.log</code>, outside <code>public_html/</code> so it isn&rsquo;t publicly accessible:</p>
+
+        <pre><code>[2026-02-20 22:05:00 WIB] [INFO] Deploy started — commit: abc123, pusher: vnby
+[2026-02-20 22:05:08 WIB] [INFO] Deploy successful — commit: abc123</code></pre>
+
+        <p>On failure, an email alert fires automatically with the error details. You want to know when the deployment pipeline breaks before a visitor discovers the site is stale.</p>
+
+        <h2>What &ldquo;deploy = git push&rdquo; Actually Feels Like</h2>
+
+        <p>The end result is real: <code>git push origin main</code> and, within about 15 seconds, the live site reflects the change. No File Manager. No FTP client. No manual step of any kind. The README now says it plainly:</p>
+
+        <pre><code># deploy = just push
+git push origin main</code></pre>
+
+        <p>That comment is doing more work than it looks like. It is documentation for future-me, a reminder that the complexity is hidden inside <code>deploy.php</code> on the server, and a small celebration that the thing actually works.</p>
+
+        <h2>Lessons</h2>
+
+        <p><strong>Debugging misdirects are common with network-layer failures.</strong> The FTP authentication errors were a symptom of a firewall issue, not a credentials issue. When you&rsquo;re stuck on what looks like one type of error, always ask whether the error message is actually describing the root cause &mdash; or just where the failure bubbled up to.</p>
+
+        <p><strong>Reversing the direction of a connection is a useful mental model.</strong> If you can&rsquo;t push to X because X blocks your IPs, ask whether X can pull from you instead. It doesn&rsquo;t always work, but it&rsquo;s a surprisingly underused reframe. The webhook approach is actually a classic pattern for shared hosting &mdash; it just wasn&rsquo;t the first thing I reached for.</p>
+
+        <p><strong>LLMs as debugging collaborators change the shape of the work.</strong> Having Claude in the loop didn&rsquo;t mean I stopped thinking about the problem &mdash; it meant I had something to think <em>against</em>. The FTP-to-webhook pivot came out of describing the IP whitelist wall and asking &ldquo;what else is possible?&rdquo; That&rsquo;s a conversation, not a Stack Overflow search. The value isn&rsquo;t in generating code; it&rsquo;s in reframing the problem space when you&rsquo;re tunnel-visioned on one approach.</p>
+
+        <p><strong>Simple infrastructure beats clever infrastructure.</strong> The final setup is: a PHP file on a shared host, a webhook configured in GitHub, and a secret key. Nothing to maintain, nothing to update, no external services. The pile of FTP workflow YAML that came before it was more elaborate and less reliable.</p>
+
+        <p>The ten days of commits from <em>Add GitHub Workflows</em> to <em>docs: add logging/alert info</em> are a fairly honest record of how technical decisions actually happen &mdash; not straight-line reasoning from problem to solution, but a series of attempts that teach you what the real problem is.</p>
+
+        <hr>
+
+        <p><em>All commit history referenced in this article is from the <a href="https://github.com/vnby/alvin-id" target="_blank">alvin.id GitHub repository</a>.</em></p>
+
+        <div class="post-nav">
+          <a href="index.html">&larr; All posts</a>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="mailto:hello@alvin.id">Email</a>
+          <a href="https://github.com/vnby" target="_blank">GitHub</a>
+          <a href="https://www.linkedin.com/in/alvin-abyan" target="_blank">LinkedIn</a>
+        </div>
+        <div class="footer-copy">&copy; 2026 Alvin Abyan</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
