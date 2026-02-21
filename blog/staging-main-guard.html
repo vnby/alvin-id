@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protecting main: Building a Staging Gate That Actually Works &mdash; Alvin Abyan</title>
+  <meta name="description" content="A messy, honest account of setting up a staging → main branch guard — and the deploy.php collision that took three attempts to fully solve." />
+  <meta property="og:title" content="Protecting main: Building a Staging Gate That Actually Works" />
+  <meta property="og:description" content="A messy, honest account of setting up a staging → main branch guard — and the deploy.php collision that took three attempts to fully solve." />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <script>
+    (function(){var t;try{t=localStorage.getItem('theme-preference')}catch(e){}if(!t)t='light';var r=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',r)})();
+  </script>
+  <style>
+    :root {
+      --bg-primary: #FAFAF7;
+      --bg-nav: rgba(250, 250, 247, 0.92);
+      --accent: #1B4D3E;
+      --accent-strong: #0F2F24;
+      --accent-soft: #E6F0EA;
+      --accent-contrast: #F8FBF8;
+      --text-primary: #1C1917;
+      --text-secondary: #57534E;
+      --text-tertiary: #78716C;
+      --text-muted: #A8A29E;
+      --border-light: #E7E5E4;
+      --border-medium: #D6D3D1;
+      --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --fs-display: 4.5rem;
+      --fs-h1: 2.75rem;
+      --fs-h2: 2rem;
+      --fs-h3: 1.25rem;
+      --fs-body: 1rem;
+      --fs-body-lg: 1.0625rem;
+      --fs-small: 0.875rem;
+      --fs-xs: 0.75rem;
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+      --space-section: 8.75rem;
+      --container-wide: 1080px;
+      --container-narrow: 700px;
+      --nav-height: 56px;
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.3s ease;
+      --transition-slow: 0.5s ease;
+    }
+    [data-theme="dark"] {
+      --bg-primary: #0C0A09;
+      --bg-nav: rgba(12, 10, 9, 0.92);
+      --text-primary: #E7E5E4;
+      --text-secondary: #A8A29E;
+      --text-tertiary: #78716C;
+      --text-muted: #57534E;
+      --border-light: #1C1917;
+      --border-medium: #292524;
+      --accent: #8CDDBB;
+      --accent-strong: #6AC9A4;
+      --accent-soft: #10241B;
+      --accent-contrast: #0F1813;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--text-primary); text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    ul { list-style: none; }
+    h1, h2 { font-family: var(--font-serif); font-weight: 400; }
+    h1 { font-size: var(--fs-h1); line-height: 1.15; letter-spacing: -0.01em; }
+    h2 { font-size: var(--fs-h2); line-height: 1.2; margin-bottom: 0; }
+    h3 { font-size: var(--fs-h3); font-weight: 500; letter-spacing: -0.01em; }
+    h4 { font-size: var(--fs-small); font-weight: 500; text-transform: uppercase; color: var(--text-muted); }
+    p { margin-bottom: var(--space-md); color: var(--text-secondary); }
+    .container { max-width: var(--container-wide); margin: 0 auto; padding: 0 var(--space-lg); }
+    .section { padding: var(--space-section) 0; }
+    .nav {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      background: var(--bg-nav);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      z-index: 100;
+      padding: 0 var(--space-lg);
+    }
+    .nav-inner {
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      height: var(--nav-height);
+    }
+    .nav-logo { font-family: var(--font-serif); font-weight: 400; font-size: 1.25rem; }
+    .nav-links {
+      display: -webkit-flex;
+      display: flex;
+      gap: 2rem;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+    .nav-links a { font-size: 0.8125rem; color: var(--text-tertiary); }
+    .nav-toggle { display: none; }
+    .fade-in.visible { opacity: 1; -webkit-transform: none; transform: none; }
+    .section-overline { font-family: var(--font-serif); font-style: italic; color: var(--accent); }
+    .footer { padding: var(--space-xl) 0; border-top: 1px solid var(--border-light); }
+    .footer-inner {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      :root { --fs-display: 3rem; --fs-h1: 2.25rem; --fs-h2: 1.5rem; --space-section: 5rem; }
+      .nav-toggle { display: block; background: none; border: none; cursor: pointer; padding: var(--space-sm); }
+      .nav-toggle span { display: block; width: 18px; height: 1.5px; background: var(--text-primary); margin: 4px 0; }
+      .nav-links {
+        position: absolute; top: var(--nav-height); left: 0; right: 0;
+        background: var(--bg-nav);
+        -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+        -webkit-flex-direction: column; flex-direction: column;
+        padding: 0 var(--space-lg); gap: 0;
+        max-height: 0; overflow: hidden;
+      }
+      .nav-links.active { max-height: 400px; padding: var(--space-md) var(--space-lg) var(--space-lg); }
+      .nav-links a { padding: 0.625rem 0; font-size: 0.9375rem; }
+      .footer-inner { -webkit-flex-direction: column; flex-direction: column; gap: var(--space-md); text-align: center; }
+    }
+    @media (max-width: 480px) {
+      :root { --fs-display: 2.5rem; }
+      .container { padding: 0 1.25rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="../css/style.css?v=20260221">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">Alvin Abyan</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="primary-nav">
+        <a href="../index.html#writing">Writing</a>
+        <a href="../index.html#photography">Photography</a>
+        <a href="../index.html#outdoors">Outdoors</a>
+        <a href="../index.html#travel">Travel</a>
+        <a href="../index.html#professional">Professional</a>
+        <a href="index.html">Blog</a>
+        <a href="../photography/index.html">Gallery</a>
+        <button class="theme-toggle" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="reading-progress" aria-hidden="true">
+    <div class="reading-progress-bar"></div>
+  </div>
+
+  <!-- Blog Post -->
+  <article class="blog-post">
+    <div class="container container--narrow">
+      <h1>Protecting main: Building a Staging Gate That Actually Works</h1>
+      <div class="post-meta">February 21, 2026 &middot; 5 min read</div>
+
+      <div class="post-content">
+
+        <p><em>A messy, honest account of setting up a staging &rarr; main branch guard &mdash; and the <code>deploy.php</code> collision that took three attempts to fully solve.</em></p>
+
+        <hr>
+
+        <p>The <a href="auto-deploy-webhook.html">last article</a> ended on a clean note: <code>git push origin main</code> and the live site updates itself within fifteen seconds. That felt good. But once the deploy pipeline was working, a natural question followed: <em>what prevents a half-finished change from going straight to production?</em></p>
+
+        <p>Until now, <code>main</code> was the only branch. Every commit landed directly on the live site. For a personal project with one contributor, that is acceptable &mdash; until it isn&rsquo;t. I wanted a <code>staging</code> branch where work could accumulate and be tested before anything touched production. More importantly, I wanted to enforce that rule mechanically, not just by convention.</p>
+
+        <p>The goal: <strong>main must only ever receive merges from staging.</strong> No direct pushes. No PRs from feature branches. Not even from myself.</p>
+
+        <p>What followed was several hours of edge cases, one revert, and a lesson about the difference between local git behaviour and what GitHub actually does server-side.</p>
+
+        <h2>The Easy Part: Restricting the Source Branch</h2>
+
+        <p>GitHub&rsquo;s branch protection rules don&rsquo;t have a native &ldquo;only allow merges from branch X&rdquo; setting. The workaround is a GitHub Actions workflow that runs on every pull request targeting <code>main</code> and fails if the source branch is anything other than <code>staging</code>:</p>
+
+        <pre><code>name: Restrict merges to staging only
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify PR is from staging branch
+        run: |
+          if [ "${{ github.head_ref }}" != "staging" ]; then
+            echo "❌ PRs to main are only allowed from the 'staging' branch."
+            exit 1
+          fi
+          echo "✅ Source branch is 'staging'. Merge allowed."</code></pre>
+
+        <p>Then you add this check as a required status check in GitHub&rsquo;s branch protection settings, and set <code>enforce_admins: true</code> so the rule applies to everyone, including repo admins. Combined, these two things mean there is literally no mechanism to bypass the gate &mdash; not even me pushing directly from the command line.</p>
+
+        <p>That part went smoothly. The harder problem was lurking one step ahead.</p>
+
+        <h2>The deploy.php Problem</h2>
+
+        <p>The deployment architecture from the previous article relies on a <code>deploy.php</code> file that lives on each server. The <code>main</code> server&rsquo;s copy targets the <code>main</code> branch, uses the production webhook secret, and logs to <code>deploy.log</code>. The <code>staging</code> server&rsquo;s copy targets <code>staging</code>, uses a different secret, and logs to <code>deploy-staging.log</code>. They are fundamentally different files that happen to share a name.</p>
+
+        <p>The moment you merge <code>staging</code> into <code>main</code>, git has to decide what to do with <code>deploy.php</code>. Left unchecked, staging&rsquo;s version &mdash; with staging&rsquo;s secret and branch target &mdash; would silently overwrite production&rsquo;s. The production deploy pipeline would start listening for the wrong branch and verify webhooks against the wrong secret.</p>
+
+        <p>Three approaches were tried. Two didn&rsquo;t work. Here is the honest account.</p>
+
+        <h3>Attempt 1: .gitattributes -merge</h3>
+
+        <p>Git has a mechanism for this: the <code>-merge</code> attribute in <code>.gitattributes</code> marks a file as non-auto-mergeable, forcing a conflict whenever the file differs between branches. The idea was to add:</p>
+
+        <pre><code># deploy.php -merge</code></pre>
+
+        <p>to <code>.gitattributes</code> on both branches and let git handle the rest. Locally, this works perfectly &mdash; any <code>git merge</code> that touches <code>deploy.php</code> produces a conflict you have to resolve manually.</p>
+
+        <p>The problem: GitHub&rsquo;s pull request merge button doesn&rsquo;t use local git. It uses a server-side merge via the API that doesn&rsquo;t honour <code>.gitattributes</code> merge drivers. When the PR was tested, GitHub reported the merge as <em>clean</em> &mdash; no conflict &mdash; and would have happily overwritten <code>main</code>&rsquo;s <code>deploy.php</code> with staging&rsquo;s. The <code>.gitattributes</code> approach is local-only.</p>
+
+        <h3>Attempt 2: Untrack deploy.php on staging</h3>
+
+        <p>If the file isn&rsquo;t tracked on <code>staging</code>, it can&rsquo;t be merged. So: <code>git rm --cached deploy.php</code> on the staging branch, add it to <code>.gitignore</code>, done.</p>
+
+        <p>This created a worse problem. The commit that untracks a file shows as a <em>deletion</em> in git. When that deletion is merged into <code>main</code>, git faithfully applies it &mdash; and deletes <code>main</code>&rsquo;s <code>deploy.php</code> from the repository entirely. We&rsquo;d have traded the wrong file for no file. That PR was closed before it could be merged.</p>
+
+        <h3>Attempt 3: The right mental model</h3>
+
+        <p>The mistake in both previous attempts was treating <code>deploy.php</code> as a file that both branches <em>own</em>. The correct framing: <code>main</code> owns <code>deploy.php</code>. Staging does not. The staging server has its own copy, but that copy is a server-side operational file &mdash; not something git should know about.</p>
+
+        <p>The solution is to reset staging&rsquo;s <code>deploy.php</code> to be <em>identical to main&rsquo;s</em> (so there is no diff and no merge conflict), and then add <code>deploy.php</code> to <code>.gitignore</code> on staging to prevent any local staging-specific version from ever being accidentally committed:</p>
+
+        <pre><code># .gitignore on staging
+# deploy.php holds server-specific secrets and config.
+# The staging server manages its own copy independently.
+# Never commit staging-specific changes — only main's version is tracked.
+deploy.php</code></pre>
+
+        <p>This way, staging&rsquo;s git tree always carries <code>main</code>&rsquo;s <code>deploy.php</code> verbatim. When the merge happens, there is no diff on that file. GitHub sees nothing to reconcile. The staging server&rsquo;s actual <code>deploy.php</code> &mdash; with staging secrets and config &mdash; lives only on disk, managed independently, invisible to git.</p>
+
+        <h2>The Post-Merge Safety Net</h2>
+
+        <p>The <code>.gitignore</code> approach prevents accidental commits. But it doesn&rsquo;t prevent someone from forcibly staging the file anyway, or a future misconfiguration from sneaking through. So a validation workflow runs on every push to <code>main</code> that touches <code>deploy.php</code>:</p>
+
+        <pre><code>- name: Check DEPLOY_BRANCH matches current branch
+  run: |
+    ACTUAL=$(grep -oP "DEPLOY_BRANCH',\s*'\K\w+" deploy.php)
+    if [ "$ACTUAL" != "main" ]; then
+      echo "❌ deploy.php has DEPLOY_BRANCH='$ACTUAL' but this is main."
+      exit 1
+    fi
+    echo "✅ deploy.php config is correct."</code></pre>
+
+        <p>If staging&rsquo;s config ever lands on <code>main</code> &mdash; through any mechanism &mdash; this check fails loudly on the next push. It&rsquo;s a post-merge safety net, not a pre-merge guard, but it means the window of silent misconfiguration is essentially zero.</p>
+
+        <h2>The Final State</h2>
+
+        <p>After all the iteration, the setup is:</p>
+
+        <p><strong>Branch protection on main:</strong> requires a passing <code>check-source-branch</code> status check, with <code>enforce_admins: true</code>. No direct pushes. No PRs from anything other than <code>staging</code>. No exceptions, including for the repository owner.</p>
+
+        <p><strong>deploy.php ownership:</strong> only <code>main</code> tracks <code>deploy.php</code>. Staging gitignores it. Staging&rsquo;s server manages its own copy directly. Merging staging into main never touches the file.</p>
+
+        <p><strong>Validation CI:</strong> guards <code>main</code>&rsquo;s <code>deploy.php</code> on every push and fails if the config doesn&rsquo;t match the expected branch. Noisy on purpose.</p>
+
+        <p>Any change now follows a single path: commit to <code>staging</code>, open a PR, pass the source-branch check, merge. The production site only updates when that sequence completes in full.</p>
+
+        <h2>What Made This Hard</h2>
+
+        <p>The core difficulty was a mismatch between local git behaviour and GitHub&rsquo;s server-side merge. When you run <code>git merge</code> locally, git reads <code>.gitattributes</code> from the working tree and respects every merge driver it finds. When you click &ldquo;Merge pull request&rdquo; on GitHub, a different code path runs that ignores those drivers entirely. Documentation for this discrepancy is sparse &mdash; it tends to surface only after you&rsquo;ve built a solution around the local behaviour and watched it fail in production.</p>
+
+        <p>The broader lesson: anything that relies on local git tooling to enforce a policy is not enforced. Policies enforced by GitHub&rsquo;s server-side systems &mdash; required status checks, branch protection rules, restricted push access &mdash; are the ones that actually hold. If a rule can be bypassed by using a different git client or skipping the UI, it is a convention, not a guard.</p>
+
+        <p>The working solution has no clever git tricks. It is branch protection, a shell script in a CI workflow, and a <code>.gitignore</code> entry. Simple things enforced at the right layer.</p>
+
+        <hr>
+
+        <p><em>This article is part of a series on the infrastructure behind <a href="https://alvin.id">alvin.id</a>. The previous post covers <a href="auto-deploy-webhook.html">building the auto-deploy webhook pipeline</a> that this staging setup builds on top of.</em></p>
+
+        <div class="post-nav">
+          <a href="index.html">&larr; All posts</a>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="mailto:hello@alvin.id">Email</a>
+          <a href="https://github.com/vnby" target="_blank">GitHub</a>
+          <a href="https://www.linkedin.com/in/alvin-abyan" target="_blank">LinkedIn</a>
+          <a href="https://x.com/alvinabyan" target="_blank">X</a>
+        </div>
+        <div class="footer-copy">&copy; 2026 Alvin Abyan</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
