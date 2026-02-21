@@ -46,6 +46,7 @@
   --container-wide: 1080px;
   --container-narrow: 700px;
   --nav-height: 56px;
+  --staging-banner-height: 0px;
 
   /* Transitions */
   --transition-fast: 0.15s ease;
@@ -233,6 +234,10 @@ p {
   z-index: 100;
   padding: 0 var(--space-lg);
   transition: box-shadow var(--transition-base);
+}
+
+.staging-banner-active .nav {
+  top: var(--staging-banner-height);
 }
 
 .nav.scrolled {
@@ -1179,6 +1184,10 @@ p {
   background: rgba(27, 77, 62, 0.08);
   z-index: 200;
   pointer-events: none;
+}
+
+.staging-banner-active .reading-progress {
+  top: var(--staging-banner-height);
 }
 
 .reading-progress-bar {
