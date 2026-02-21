@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website, Alvin Abyan</title>
-  <meta name="description" content="A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
+  <meta name="description" content="A five-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
   <meta property="og:title" content="The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website" />
-  <meta property="og:description" content="A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
+  <meta property="og:description" content="A five-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -191,11 +191,11 @@
   <article class="blog-post">
     <div class="container container--narrow">
       <h1>The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website</h1>
-      <div class="post-meta">February 20, 2026 &middot; 9 min read</div>
+      <div class="post-meta">February 15, 2026 &middot; 9 min read</div>
 
       <div class="post-content">
 
-        <p><em>A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made <code>git push</code> enough to deploy.</em></p>
+        <p><em>A five-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made <code>git push</code> enough to deploy.</em></p>
 
         <hr>
 
@@ -205,7 +205,7 @@
 
         <p>The goal was simple: <code>git push</code> and the live site updates itself.</p>
 
-        <p>What followed was a ten-day arc through two completely different technical approaches, one of which hit a wall I couldn&rsquo;t climb, and the other of which I wouldn&rsquo;t have thought of on my own.</p>
+        <p>What followed was a five-day arc through two completely different technical approaches, one of which hit a wall I couldn&rsquo;t climb, and the other of which I wouldn&rsquo;t have thought of on my own.</p>
 
         <h2>The Obvious Approach: GitHub Actions + FTP</h2>
 
@@ -406,7 +406,7 @@ git push origin main</code></pre>
 
         <p><strong>Simple infrastructure beats clever infrastructure.</strong> The final setup is: a PHP file on a shared host, a webhook configured in GitHub, and a secret key. Nothing to maintain, nothing to update, no external services. The pile of FTP workflow YAML that came before it was more elaborate and less reliable.</p>
 
-        <p>The ten days of commits from <em>Add GitHub Workflows</em> to <em>docs: add logging/alert info</em> are a fairly honest record of how technical decisions actually happen, not straight-line reasoning from problem to solution, but a series of attempts that teach you what the real problem is.</p>
+        <p>The five days of commits from <em>Add GitHub Workflows</em> to <em>docs: add logging/alert info</em> are a fairly honest record of how technical decisions actually happen, not straight-line reasoning from problem to solution, but a series of attempts that teach you what the real problem is.</p>
 
         <hr>
 
