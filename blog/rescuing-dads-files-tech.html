@@ -322,71 +322,72 @@
         </ol>
 
         <h2>Technical Glossary</h2>
-        <table>
-          <thead>
-            <tr><th>Term</th><th>Meaning</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>KMODE_EXCEPTION_NOT_HANDLED</code></td><td>Kernel-mode BSOD: an unhandled exception in Ring 0 code</td></tr>
-            <tr><td><code>SrtTrail.txt</code></td><td>Startup Repair Trail log, indicates WinRE repair failed</td></tr>
-            <tr><td>NVMe</td><td>Non-Volatile Memory Express, protocol for SSDs via PCIe</td></tr>
-            <tr><td>VMD</td><td>Volume Management Device, Intel's NVMe abstraction layer</td></tr>
-            <tr><td>AHCI</td><td>Advanced Host Controller Interface, standard storage mode</td></tr>
-            <tr><td>RST / IRST</td><td>(Intel) Rapid Storage Technology, Intel's storage driver layer</td></tr>
-            <tr><td><code>iaStorVD</code></td><td>Intel Advanced Storage Volume Device driver</td></tr>
-            <tr><td>TPM 2.0</td><td>Trusted Platform Module, hardware security chip for key sealing</td></tr>
-            <tr><td>PCR</td><td>Platform Configuration Register, TPM measurement slots</td></tr>
-            <tr><td>VMK</td><td>Volume Master Key, BitLocker's per-volume encryption key</td></tr>
-            <tr><td>BitLocker</td><td>Windows full-disk encryption, can be TPM-sealed</td></tr>
-            <tr><td>WinRE</td><td>Windows Recovery Environment</td></tr>
-            <tr><td>Windows PE</td><td>Windows Preinstallation Environment, minimal Windows from USB</td></tr>
-            <tr><td><code>wimlib</code></td><td>Open-source library for manipulating WIM (Windows Image) files</td></tr>
-            <tr><td><code>.swm</code></td><td>Split Windows Image, WIM chunks for FAT32 compatibility</td></tr>
-            <tr><td><code>.wim</code></td><td>Windows Image format, compressed OS image</td></tr>
-            <tr><td>MBR</td><td>Master Boot Record, legacy partition table scheme</td></tr>
-            <tr><td>GPT</td><td>GUID Partition Table, modern UEFI partition table</td></tr>
-            <tr><td>FAT32</td><td>File Allocation Table (32-bit), 4GB file size limit</td></tr>
-            <tr><td>exFAT</td><td>Extended FAT, no practical file size limit, cross-platform</td></tr>
-            <tr><td>NTFS</td><td>New Technology File System, Windows native</td></tr>
-            <tr><td>ext4</td><td>Fourth Extended Filesystem, Linux native</td></tr>
-            <tr><td>UDF</td><td>Universal Disk Format, optical disc filesystem</td></tr>
-            <tr><td><code>dd</code></td><td>Data Duplicator, raw block-level copy tool</td></tr>
-            <tr><td><code>/dev/rdisk</code></td><td>macOS raw disk device, bypasses buffer cache for faster I/O</td></tr>
-            <tr><td><code>bs=4m</code></td><td>Block size parameter for dd (4MB per read/write op)</td></tr>
-            <tr><td><code>SIGINFO</code> / <code>Ctrl+T</code></td><td>macOS signal to query process status (dd progress)</td></tr>
-            <tr><td><code>isohybrid</code></td><td>Tool that makes ISOs bootable from both optical and USB media</td></tr>
-            <tr><td>DCHU</td><td>Declarative, Componentized, Hardware Support Apps, Universal</td></tr>
-            <tr><td>TGL</td><td>Tiger Lake, Intel's 11th-gen CPU microarchitecture</td></tr>
-            <tr><td><code>9A0B</code></td><td>PCI device ID for Tiger Lake VMD controller</td></tr>
-            <tr><td><code>diskpart</code></td><td>Windows CLI disk partitioning tool</td></tr>
-            <tr><td><code>diskutil</code></td><td>macOS CLI disk management utility</td></tr>
-            <tr><td><code>manage-bde</code></td><td>BitLocker Drive Encryption CLI management tool</td></tr>
-            <tr><td><code>dislocker</code></td><td>Linux FUSE tool for mounting BitLocker volumes</td></tr>
-            <tr><td>FUSE</td><td>Filesystem in Userspace, Linux kernel module for custom FS</td></tr>
-            <tr><td><code>nmap</code></td><td>Network Mapper, network discovery and security scanning</td></tr>
-            <tr><td><code>arp -a</code></td><td>Display ARP cache (IP ↔ MAC address mappings)</td></tr>
-            <tr><td>OUI</td><td>Organizationally Unique Identifier, first 3 MAC octets</td></tr>
-            <tr><td>mDNS</td><td>Multicast DNS, <code>.local</code> hostname resolution (Bonjour/Avahi)</td></tr>
-            <tr><td>BCM2711</td><td>Broadcom SoC used in Raspberry Pi 4 Model B</td></tr>
-            <tr><td><code>.dtb</code></td><td>Device Tree Blob, hardware description file for ARM Linux</td></tr>
-            <tr><td>SMART</td><td>Self-Monitoring, Analysis and Reporting Technology (disk health)</td></tr>
-            <tr><td>OOBE</td><td>Out-of-Box Experience, Windows initial setup wizard</td></tr>
-            <tr><td>CSM</td><td>Compatibility Support Module, UEFI legacy BIOS fallback</td></tr>
-            <tr><td>UEFI</td><td>Unified Extensible Firmware Interface, modern BIOS replacement</td></tr>
-            <tr><td>Ring 0 / Ring 3</td><td>CPU privilege levels, kernel mode vs user mode</td></tr>
-            <tr><td><code>rsync</code></td><td>Remote (and local) file synchronization tool</td></tr>
-            <tr><td><code>robocopy</code></td><td>Robust File Copy, Windows advanced file copy utility</td></tr>
-            <tr><td><code>xcopy</code></td><td>Extended Copy, Windows file copy with subdirectory support</td></tr>
-            <tr><td><code>sfc /scannow</code></td><td>System File Checker, scans and repairs Windows system files</td></tr>
-            <tr><td>DISM</td><td>Deployment Image Servicing and Management</td></tr>
-            <tr><td><code>bootrec</code></td><td>Boot Record repair utility (fixmbr, fixboot, rebuildbcd)</td></tr>
-            <tr><td><code>chkdsk</code></td><td>Check Disk, Windows filesystem integrity checker</td></tr>
-            <tr><td><code>7zz</code></td><td>7-Zip CLI, archive extraction (used for <code>.exe</code> driver packages)</td></tr>
-            <tr><td>npm prefix</td><td>npm config setting that controls global install location</td></tr>
-            <tr><td><code>$PATH</code></td><td>Shell environment variable listing executable search directories</td></tr>
-            <tr><td><code>.bashrc</code></td><td>Bash shell configuration file, sourced on interactive login</td></tr>
-          </tbody>
-        </table>
+        <section class="technical-glossary" aria-label="Technical glossary">
+          <div class="technical-glossary-head" aria-hidden="true">
+            <span>Term</span>
+            <span>Meaning</span>
+          </div>
+          <dl class="technical-glossary-list">
+            <div class="technical-glossary-item"><dt><code>KMODE_EXCEPTION_NOT_HANDLED</code></dt><dd>Kernel-mode BSOD: an unhandled exception in Ring 0 code</dd></div>
+            <div class="technical-glossary-item"><dt><code>SrtTrail.txt</code></dt><dd>Startup Repair Trail log, indicates WinRE repair failed</dd></div>
+            <div class="technical-glossary-item"><dt>NVMe</dt><dd>Non-Volatile Memory Express, protocol for SSDs via PCIe</dd></div>
+            <div class="technical-glossary-item"><dt>VMD</dt><dd>Volume Management Device, Intel's NVMe abstraction layer</dd></div>
+            <div class="technical-glossary-item"><dt>AHCI</dt><dd>Advanced Host Controller Interface, standard storage mode</dd></div>
+            <div class="technical-glossary-item"><dt>RST / IRST</dt><dd>(Intel) Rapid Storage Technology, Intel's storage driver layer</dd></div>
+            <div class="technical-glossary-item"><dt><code>iaStorVD</code></dt><dd>Intel Advanced Storage Volume Device driver</dd></div>
+            <div class="technical-glossary-item"><dt>TPM 2.0</dt><dd>Trusted Platform Module, hardware security chip for key sealing</dd></div>
+            <div class="technical-glossary-item"><dt>PCR</dt><dd>Platform Configuration Register, TPM measurement slots</dd></div>
+            <div class="technical-glossary-item"><dt>VMK</dt><dd>Volume Master Key, BitLocker's per-volume encryption key</dd></div>
+            <div class="technical-glossary-item"><dt>BitLocker</dt><dd>Windows full-disk encryption, can be TPM-sealed</dd></div>
+            <div class="technical-glossary-item"><dt>WinRE</dt><dd>Windows Recovery Environment</dd></div>
+            <div class="technical-glossary-item"><dt>Windows PE</dt><dd>Windows Preinstallation Environment, minimal Windows from USB</dd></div>
+            <div class="technical-glossary-item"><dt><code>wimlib</code></dt><dd>Open-source library for manipulating WIM (Windows Image) files</dd></div>
+            <div class="technical-glossary-item"><dt><code>.swm</code></dt><dd>Split Windows Image, WIM chunks for FAT32 compatibility</dd></div>
+            <div class="technical-glossary-item"><dt><code>.wim</code></dt><dd>Windows Image format, compressed OS image</dd></div>
+            <div class="technical-glossary-item"><dt>MBR</dt><dd>Master Boot Record, legacy partition table scheme</dd></div>
+            <div class="technical-glossary-item"><dt>GPT</dt><dd>GUID Partition Table, modern UEFI partition table</dd></div>
+            <div class="technical-glossary-item"><dt>FAT32</dt><dd>File Allocation Table (32-bit), 4GB file size limit</dd></div>
+            <div class="technical-glossary-item"><dt>exFAT</dt><dd>Extended FAT, no practical file size limit, cross-platform</dd></div>
+            <div class="technical-glossary-item"><dt>NTFS</dt><dd>New Technology File System, Windows native</dd></div>
+            <div class="technical-glossary-item"><dt>ext4</dt><dd>Fourth Extended Filesystem, Linux native</dd></div>
+            <div class="technical-glossary-item"><dt>UDF</dt><dd>Universal Disk Format, optical disc filesystem</dd></div>
+            <div class="technical-glossary-item"><dt><code>dd</code></dt><dd>Data Duplicator, raw block-level copy tool</dd></div>
+            <div class="technical-glossary-item"><dt><code>/dev/rdisk</code></dt><dd>macOS raw disk device, bypasses buffer cache for faster I/O</dd></div>
+            <div class="technical-glossary-item"><dt><code>bs=4m</code></dt><dd>Block size parameter for dd (4MB per read/write op)</dd></div>
+            <div class="technical-glossary-item"><dt><code>SIGINFO</code> / <code>Ctrl+T</code></dt><dd>macOS signal to query process status (dd progress)</dd></div>
+            <div class="technical-glossary-item"><dt><code>isohybrid</code></dt><dd>Tool that makes ISOs bootable from both optical and USB media</dd></div>
+            <div class="technical-glossary-item"><dt>DCHU</dt><dd>Declarative, Componentized, Hardware Support Apps, Universal</dd></div>
+            <div class="technical-glossary-item"><dt>TGL</dt><dd>Tiger Lake, Intel's 11th-gen CPU microarchitecture</dd></div>
+            <div class="technical-glossary-item"><dt><code>9A0B</code></dt><dd>PCI device ID for Tiger Lake VMD controller</dd></div>
+            <div class="technical-glossary-item"><dt><code>diskpart</code></dt><dd>Windows CLI disk partitioning tool</dd></div>
+            <div class="technical-glossary-item"><dt><code>diskutil</code></dt><dd>macOS CLI disk management utility</dd></div>
+            <div class="technical-glossary-item"><dt><code>manage-bde</code></dt><dd>BitLocker Drive Encryption CLI management tool</dd></div>
+            <div class="technical-glossary-item"><dt><code>dislocker</code></dt><dd>Linux FUSE tool for mounting BitLocker volumes</dd></div>
+            <div class="technical-glossary-item"><dt>FUSE</dt><dd>Filesystem in Userspace, Linux kernel module for custom FS</dd></div>
+            <div class="technical-glossary-item"><dt><code>nmap</code></dt><dd>Network Mapper, network discovery and security scanning</dd></div>
+            <div class="technical-glossary-item"><dt><code>arp -a</code></dt><dd>Display ARP cache (IP ↔ MAC address mappings)</dd></div>
+            <div class="technical-glossary-item"><dt>OUI</dt><dd>Organizationally Unique Identifier, first 3 MAC octets</dd></div>
+            <div class="technical-glossary-item"><dt>mDNS</dt><dd>Multicast DNS, <code>.local</code> hostname resolution (Bonjour/Avahi)</dd></div>
+            <div class="technical-glossary-item"><dt>BCM2711</dt><dd>Broadcom SoC used in Raspberry Pi 4 Model B</dd></div>
+            <div class="technical-glossary-item"><dt><code>.dtb</code></dt><dd>Device Tree Blob, hardware description file for ARM Linux</dd></div>
+            <div class="technical-glossary-item"><dt>SMART</dt><dd>Self-Monitoring, Analysis and Reporting Technology (disk health)</dd></div>
+            <div class="technical-glossary-item"><dt>OOBE</dt><dd>Out-of-Box Experience, Windows initial setup wizard</dd></div>
+            <div class="technical-glossary-item"><dt>CSM</dt><dd>Compatibility Support Module, UEFI legacy BIOS fallback</dd></div>
+            <div class="technical-glossary-item"><dt>UEFI</dt><dd>Unified Extensible Firmware Interface, modern BIOS replacement</dd></div>
+            <div class="technical-glossary-item"><dt>Ring 0 / Ring 3</dt><dd>CPU privilege levels, kernel mode vs user mode</dd></div>
+            <div class="technical-glossary-item"><dt><code>rsync</code></dt><dd>Remote (and local) file synchronization tool</dd></div>
+            <div class="technical-glossary-item"><dt><code>robocopy</code></dt><dd>Robust File Copy, Windows advanced file copy utility</dd></div>
+            <div class="technical-glossary-item"><dt><code>xcopy</code></dt><dd>Extended Copy, Windows file copy with subdirectory support</dd></div>
+            <div class="technical-glossary-item"><dt><code>sfc /scannow</code></dt><dd>System File Checker, scans and repairs Windows system files</dd></div>
+            <div class="technical-glossary-item"><dt>DISM</dt><dd>Deployment Image Servicing and Management</dd></div>
+            <div class="technical-glossary-item"><dt><code>bootrec</code></dt><dd>Boot Record repair utility (fixmbr, fixboot, rebuildbcd)</dd></div>
+            <div class="technical-glossary-item"><dt><code>chkdsk</code></dt><dd>Check Disk, Windows filesystem integrity checker</dd></div>
+            <div class="technical-glossary-item"><dt><code>7zz</code></dt><dd>7-Zip CLI, archive extraction (used for <code>.exe</code> driver packages)</dd></div>
+            <div class="technical-glossary-item"><dt>npm prefix</dt><dd>npm config setting that controls global install location</dd></div>
+            <div class="technical-glossary-item"><dt><code>$PATH</code></dt><dd>Shell environment variable listing executable search directories</dd></div>
+            <div class="technical-glossary-item"><dt><code>.bashrc</code></dt><dd>Bash shell configuration file, sourced on interactive login</dd></div>
+          </dl>
+        </section>
 
         <h2>Final Thoughts</h2>
         <p>Looking back, the successful approach was almost embarrassingly simple compared to everything else I tried. Boot from USB. Load driver. Open command prompt. Copy files. Done.</p>
