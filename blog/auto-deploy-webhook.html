@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website — Alvin Abyan</title>
+  <title>The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website, Alvin Abyan</title>
   <meta name="description" content="A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
   <meta property="og:title" content="The Wrong Way, Then the Right Way: Auto-Deploying My Personal Website" />
   <meta property="og:description" content="A ten-day journey through FTP failures, IP firewalls, and a webhook pivot that finally made git push enough to deploy." />
@@ -382,8 +382,8 @@ jobs:
 
         <p><strong>Logging and alerts.</strong> A silent deployment pipeline is hard to debug after the fact. Every deploy writes a timestamped entry to <code>~/deploy.log</code>, outside <code>public_html/</code> so it isn&rsquo;t publicly accessible:</p>
 
-        <pre><code>[2026-02-20 22:05:00 WIB] [INFO] Deploy started — commit: abc123, pusher: vnby
-[2026-02-20 22:05:08 WIB] [INFO] Deploy successful — commit: abc123</code></pre>
+        <pre><code>[2026-02-20 22:05:00 WIB] [INFO] Deploy started, commit: abc123, pusher: vnby
+[2026-02-20 22:05:08 WIB] [INFO] Deploy successful, commit: abc123</code></pre>
 
         <p>On failure, an email alert fires automatically with the error details. You want to know when the deployment pipeline breaks before a visitor discovers the site is stale.</p>
 
