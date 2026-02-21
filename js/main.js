@@ -1,3 +1,19 @@
+// Global staging environment banner
+(function () {
+  if (window.location.hostname !== 'stg.alvin.id') return;
+  if (document.getElementById('staging-banner')) return;
+
+  var banner = document.createElement('div');
+  banner.id = 'staging-banner';
+  banner.textContent = 'STAGING - stg.alvin.id';
+  banner.setAttribute(
+    'style',
+    'position:fixed;top:0;left:0;right:0;z-index:9999;background:#b45309;color:#fff;text-align:center;font-size:12px;font-family:monospace;padding:4px 0;letter-spacing:0.05em;line-height:1.2;'
+  );
+  document.body.insertBefore(banner, document.body.firstChild);
+  document.body.style.paddingTop = '24px';
+})();
+
 // Theme toggle — single-click cycle: auto → light → dark → auto
 (function () {
   var STORAGE_KEY = 'theme-preference';
