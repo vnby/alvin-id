@@ -1220,6 +1220,21 @@ p {
   margin-bottom: 0;
 }
 
+.blog-post .post-content a {
+  color: var(--accent-strong);
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.16em;
+  transition: color var(--transition-fast), text-decoration-thickness var(--transition-fast);
+}
+
+.blog-post .post-content a:hover,
+.blog-post .post-content a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
 .blog-post .post-content h2 {
   font-family: var(--font-serif);
   font-size: 1.75rem;
@@ -1294,6 +1309,62 @@ p {
   padding: 0;
   font-size: inherit;
   color: var(--text-secondary);
+}
+
+.blog-post .post-content .technical-glossary {
+  margin: 0 0 var(--space-xl);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--accent-contrast);
+}
+
+.blog-post .post-content .technical-glossary-head {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) 1.8fr;
+  gap: var(--space-md);
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.blog-post .post-content .technical-glossary-list {
+  margin: 0;
+  padding: 0;
+}
+
+.blog-post .post-content .technical-glossary-item {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) 1.8fr;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0.95rem 1.2rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.blog-post .post-content .technical-glossary-item:first-child {
+  border-top: none;
+}
+
+.blog-post .post-content .technical-glossary-item dt {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.blog-post .post-content .technical-glossary-item dd {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.blog-post .post-content .technical-glossary-item dt code {
+  white-space: normal;
 }
 
 /* ===== Photography Page ===== */
@@ -1573,6 +1644,20 @@ p {
     margin-left: 0;
     align-self: flex-start;
     padding: 0.625rem 0;
+  }
+
+  .blog-post .post-content .technical-glossary-head {
+    display: none;
+  }
+
+  .blog-post .post-content .technical-glossary-item {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .blog-post .post-content .technical-glossary-item dt {
+    font-size: var(--fs-small);
   }
 }
 
