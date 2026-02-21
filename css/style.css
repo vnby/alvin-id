@@ -1266,11 +1266,13 @@ p {
 .blog-post .post-nav a {
   font-size: var(--fs-small);
   color: var(--accent-strong);
+  text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 .blog-post .post-nav a:hover {
   color: var(--accent);
+  text-decoration: none;
 }
 
 .blog-post .post-content h3 {
