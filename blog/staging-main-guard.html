@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Protecting main: Building a Staging Gate That Actually Works &mdash; Alvin Abyan</title>
-  <meta name="description" content="A messy, honest account of setting up a staging → main branch guard — and the deploy.php collision that took three attempts to fully solve." />
+  <meta name="description" content="A messy, honest account of setting up a staging → main branch guard ,  and the deploy.php collision that took three attempts to fully solve." />
   <meta property="og:title" content="Protecting main: Building a Staging Gate That Actually Works" />
-  <meta property="og:description" content="A messy, honest account of setting up a staging → main branch guard — and the deploy.php collision that took three attempts to fully solve." />
+  <meta property="og:description" content="A messy, honest account of setting up a staging → main branch guard ,  and the deploy.php collision that took three attempts to fully solve." />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -266,7 +266,7 @@ jobs:
         <pre><code># .gitignore on staging
 # deploy.php holds server-specific secrets and config.
 # The staging server manages its own copy independently.
-# Never commit staging-specific changes — only main's version is tracked.
+# Never commit staging-specific changes ,  only main's version is tracked.
 deploy.php</code></pre>
 
         <p>This way, staging&rsquo;s git tree always carries <code>main</code>&rsquo;s <code>deploy.php</code> verbatim. When the merge happens, there is no diff on that file. GitHub sees nothing to reconcile. The staging server&rsquo;s actual <code>deploy.php</code> &mdash; with staging secrets and config &mdash; lives only on disk, managed independently, invisible to git.</p>
